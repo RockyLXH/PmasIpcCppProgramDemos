@@ -24,68 +24,62 @@
 #include <syslog.h>			// for system log
 #include <math.h>
 
+/*
+ * Algorithms switch in SIL function
+ */
+#define ANALOG_COMMAND_FOR_VEL_LOOP 	0
+#define SIN_GEN_FOR_POS_LOOP 			0
+#define VEL_LOOP_PID_CONTROLLER			1
+
+#define USE_MDS3						0
+
+/*
+ * Using Timer in function for measuring the time elapsed
+ * use macro define 'TIMER()' in function which needs to be measured
+ */
+
+struct Timer
+{
+#if USE_MDS3
+	private:
+		const char* m_name;
+		struct timeval start, end;
+	public:
+		Timer(const char* name) :m_name(name)
+		{
+			gettimeofday(&start, NULL);
+		}
+
+		~Timer()
+		{
+			gettimeofday(&end, NULL);
+			std::cout << "function: " << m_name << " duration: [" << end.tv_usec - start.tv_usec << " us]\n";
+		}
+#else
+	private:
+		std::chrono::time_point<std::chrono::steady_clock> start;
+		const char* m_name;
+	public:
+		Timer(const char* name) :m_name(name)
+		{
+			start = std::chrono::high_resolution_clock::now();
+		}
+
+		~Timer()
+		{
+			auto end = std::chrono::high_resolution_clock::now();
+			auto duration = end - start;
+			std::cout << "function: " << m_name << " duration: [" << duration.count() << " us]\n";
+		}
+#endif
+};
+
 #define MEASUREMENT	1
 #if	MEASUREMENT
 	#define TIMER()	Timer timer(__PRETTY_FUNCTION__)
 #else
 	#define TIMER(name)
 #endif
-
-
-#define ANALOG_COMMAND_FOR_VEL_LOOP 	0
-#define SIN_GEN_FOR_POS_LOOP 			0
-#define VEL_LOOP_PID_CONTROLLER			1
-
-/*
- * Using Timer in function for measuring the time elapsed
- */
-#ifdef MDS3
-struct Timer
-{
-	const char* m_name;
-	struct timeval start, end;
-
-	Timer(const char* name) :m_name(name)
-	{
-		gettimeofday(&start, NULL);
-	}
-
-	~Timer()
-	{
-		gettimeofday(&end, NULL);
-		std::cout << "function: " << m_name << " duration: [" << end.tv_usec - start.tv_usec << " us]\n";
-	}
-};
-#else
-struct Timer
-{
-private:
-	std::chrono::time_point<std::chrono::steady_clock> start;
-	const char* m_name;
-public:
-	Timer(const char* name) :m_name(name)
-	{
-		start = std::chrono::high_resolution_clock::now();
-	}
-
-	~Timer()
-	{
-		auto end = std::chrono::high_resolution_clock::now();
-		auto duration = end - start;
-		std::cout << "function: " << m_name << " duration: [" << duration.count() << " us] using chrono\n";
-	}
-};
-#endif
-
-//
-//void func()
-//{
-//	// add 'Timer timer' for measuring the whole function duration.
-//	Timer timer;
-//
-//	for (int i=0; i<100; i++)
-//		std::cout << "hello" << std::endl;
-//}
 
 /*
 ============================================================================
@@ -104,6 +98,7 @@ public:
  The main function of this sample project.
 ============================================================================
 */
+
 int main(int argc, char *argv[])
 {
 	try
@@ -133,7 +128,7 @@ int main(int argc, char *argv[])
 		 */
 		openlog("SIL Program", LOG_CONS | LOG_PID, 0);
 
-		syslog(LOG_DEBUG, "the program <%s> is runing now\n", argv[0]);
+		syslog(LOG_DEBUG, "the program <%s> is working\n", argv[0]);
 		//
 		// Initialize system, axes and all needed initializations
 		MainInit();
@@ -185,6 +180,8 @@ void MainLoop()
 
 void SILInit()
 {
+	static_assert(MAX_AXES >= 1, "configure at least 1 axis!");
+
 	for (int i = 0; i < MAX_AXES; ++i) {
 		// 0 - NC profiler
 		// 1 - 0;
@@ -193,7 +190,7 @@ void SILInit()
 //		cRTaxis[i].SetBoolParameter(0, MMC_UCUSER6071_SRC, 0) ;
 		cRTaxis[i].SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
 
-			// set a01 to CSP mode
+		// go to CSP mode
 		cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_POSITION_MODE);
 //		cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_TORQUE_MODE);
 
@@ -221,6 +218,7 @@ void SILInit()
 	}
 
 	MMC_CreateSYNCTimer(gConnHndl,SILCallBackFun,1);
+
 
 	MMC_SetRTUserCallback(gConnHndl, 1); //set user call-back function to highest priority -> 1.
 

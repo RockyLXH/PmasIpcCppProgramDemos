@@ -27,7 +27,7 @@ int SILCallBackFun(void);
  General constants
 ============================================================================
 */
-#define 	MAX_AXES				1		// number of Physical axes in the system. TODO Update MAX_AXES accordingly
+#define 	MAX_AXES				1		// number of Physical axes in the system
 /*
 ============================================================================
  Application global variables

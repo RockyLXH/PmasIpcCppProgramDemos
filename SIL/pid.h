@@ -2,11 +2,10 @@
  * pid.h
  *
  *  Created on: Jul 25, 2022
- *      Author: tjbli
+ *      Author: RockyLiu
  */
 
-#ifndef PID_H_
-#define PID_H_
+#pragma once
 
 #define _constrain(amt, low, high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
@@ -15,6 +14,9 @@ class PIDController
 public:
 	PIDController(double P, double I, double D, double ramp, double limit, double Ts);
 	~PIDController() = default;
+
+	PIDController(const PIDController&) = delete;
+	PIDController& operator= (const PIDController&) = delete;
 
 	double operator() (double error);
 
@@ -30,7 +32,3 @@ private:
 	double output_prev;
 	double integral_prev;
 };
-
-
-
-#endif /* PID_H_ */

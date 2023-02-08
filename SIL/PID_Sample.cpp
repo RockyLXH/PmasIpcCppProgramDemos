@@ -68,7 +68,7 @@ struct Timer
 		~Timer()
 		{
 			auto end = std::chrono::high_resolution_clock::now();
-			auto duration = end - start;
+			std::chrono::duration<double> duration = end - start;
 			std::cout << "function: " << m_name << " duration: [" << duration.count() << " us]\n";
 		}
 #endif
@@ -159,15 +159,11 @@ int main(int argc, char *argv[])
 
 void ReadMbusInput()
 {
-	MBus.MbusReadHoldingRegisterTable(0, 3, mbus_read_out);
+	MBus.MbusReadHoldingRegisterTable(0, 2, mbus_read_out);
 
 	giTerminate = mbus_read_out.regArr[0];
 	target_velocity = (double)mbus_read_out.regArr[1];
-//	acc_dec = (double)mbus_read_out.regArr[2];
-//	if (target_velocity != prev_target_velocity) {
-//		prev_target_velocity = target_velocity;
-//		acc_dec_time = abs(target_velocity - prev_target_velocity) * 1000.0f / acc_dec;  //acc and dec time, unit: ms
-//	}
+
 }
 
 void MainLoop()
@@ -180,7 +176,7 @@ void MainLoop()
 
 void SILInit()
 {
-	static_assert(MAX_AXES >= 1, "configure at least 1 axis!");
+	static_assert(MAX_AXES >= 1, "configure at least 1 axis by setting 'MAX_AXES' macro!");
 
 	for (int i = 0; i < MAX_AXES; ++i) {
 		// 0 - NC profiler
@@ -240,30 +236,20 @@ void SILInit()
 */
 void MainInit()
 {
-	//
-	// Here will come initialization code for all system, axes, communication etc.
-	//
-//	struct sigaction stSigAction;
-//	//
-//	// Init the sigAction structure.
-//	memset(&stSigAction, 0, sizeof(stSigAction));
-//	stSigAction.sa_handler = &TerminateApplication;
-//	// Initialized case of CTRL+C.
-//	sigaction(SIGINT, &stSigAction, NULL);
-	//
 	// InitializeCommunication to the GMAS:
 	gConnHndl = cConn.ConnectIPCEx(0x7fffffff, (MMC_MB_CLBK)CallbackFunc) ;
 
 	MBus.MbusStartServer(gConnHndl, 1);
+
 	// 	Enable throw feature.
 	CMMCPPGlobal::Instance()->SetThrowFlag(true, false);
-	//
+
 	// Register Run Time Error Callback function
 	CMMCPPGlobal::Instance()->RegisterRTE(OnRunTimeError);
-	//
+
 	// Register the callback function for Emergency:
 	cConn.RegisterEventCallback(MMCPP_EMCY, (void*)Emergency_Received) ;
-	//
+
 	// Initialize default parameters. This is not a must. Each parameter may be initialized individually.
 	stSingleDefault.fEndVelocity	= 0 ;
 	stSingleDefault.dbDistance 		= 100000 ;

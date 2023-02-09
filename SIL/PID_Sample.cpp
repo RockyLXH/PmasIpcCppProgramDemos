@@ -2,15 +2,7 @@
 ============================================================================
  Name : PID_Sample.cpp
  Author :	Elmo Motion Control
- Version :	1.00
- Description : The following example supports the following functionalities:
-
-- Power On.
-- Power Off.
-
- The program works with 2 axes - a01 and a02.
- The program works with CAN and EtherCAT.
-
+ Version :	1.0
 ============================================================================
 */
 #include "mmc_definitions.h"
@@ -67,9 +59,10 @@ struct Timer
 
 		~Timer()
 		{
-			auto end = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double> duration = end - start;
-			std::cout << "function: " << m_name << " duration: [" << duration.count() << " us]\n";
+			auto dur = std::chrono::high_resolution_clock::now() - start;
+			std::cout << "function: " << m_name << " duration: ["
+					  << dur.count()
+					  << " us]\n";
 		}
 #endif
 };
@@ -373,7 +366,7 @@ int CallbackFunc(unsigned char* recvBuffer, short recvBufferSize,void* lpsock)
 		break ;
 	*/
 	}
-	//
+
 	return 1 ;
 }
 
@@ -466,6 +459,7 @@ void Emergency_Received(unsigned short usAxisRef, short sEmcyCode)
 int SILCallBackFun(void)
 {
 	TIMER();
+
 //	if (b) {
 //		cRTaxis[1].EthercatWritePIVar(3, 0);
 //		b = false;

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.elmomc.project.CppDebugConfiguration.1962688125">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.elmomc.project.CppDebugConfiguration.1962688125" moduleId="org.eclipse.cdt.core.settings" name="GOLD_D">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="gexe" artifactName="${ProjName}" buildProperties="" cleanCommand="rm -rf ../*.launch" description="Debug Gold" id="com.elmomc.project.CppDebugConfiguration.1962688125" name="GOLD_D" optionalBuildProperties="" parent="com.elmomc.project.CppDebugConfiguration.1962688125" postbuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/generateLaunchConfiguration.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot; &quot;${ConfigName}&quot;" prebuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/cleanPreviousArtifacts.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot;">
+					<folderInfo id="com.elmomc.project.CppDebugConfiguration.1962688125." name="/" resourcePath="">
+						<toolChain id="com.elmomc.project.CppElmoToolchainDebug.1689675455" name="Elmo C++ toolchain" superClass="com.elmomc.project.CppElmoToolchainDebug">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.elmomc.project.Cpp.Gold.Platform.1996400751" isAbstract="false" superClass="com.elmomc.project.Cpp.Gold.Platform"/>
+							<builder buildPath="${workspace_loc:/PVT Files Oceaneering/GOLD_D}" id="com.elmomc.project.CppBuilder.1005934000" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU Make" superClass="com.elmomc.project.CppBuilder"/>
+							<tool id="com.elmomc.project.CppLinker.1990437970" name="Gold C++ linker" superClass="com.elmomc.project.CppLinker"/>
+							<tool id="com.elmomc.project.CppGMASCompilerExtended.640350680" name="Gold C++ compiler" superClass="com.elmomc.project.CppGMASCompilerExtended">
+								<inputType id="com.elmomc.project.CppSource.550734677" name="C source files" superClass="com.elmomc.project.CppSource"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+		</cconfiguration>
+		<cconfiguration id="com.elmomc.project.CppPlatinumDebugConfiguration.2032065605">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.elmomc.project.CppPlatinumDebugConfiguration.2032065605" moduleId="org.eclipse.cdt.core.settings" name="PLATINUM_D">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="pexe" artifactName="${ProjName}" buildProperties="" cleanCommand="rm -rf ../*.launch" description="Debug Platinum" id="com.elmomc.project.CppPlatinumDebugConfiguration.2032065605" name="PLATINUM_D" parent="com.elmomc.project.CppPlatinumDebugConfiguration.2032065605" postbuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/generateLaunchConfiguration.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot; &quot;${ConfigName}&quot;" prebuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/cleanPreviousArtifacts.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot;">
+					<folderInfo id="com.elmomc.project.CppPlatinumDebugConfiguration.2032065605." name="/" resourcePath="">
+						<toolChain id="com.elmomc.project.CppPlatinumElmoToolchainDebug.1760659595" name="Elmo C++ toolchain" superClass="com.elmomc.project.CppPlatinumElmoToolchainDebug">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.elmomc.project.Cpp.Platinum.Platform.707475403" isAbstract="false" superClass="com.elmomc.project.Cpp.Platinum.Platform"/>
+							<builder buildPath="${workspace_loc:/PVT Files Oceaneering/PLATINUM_D}" id="com.elmomc.project.CppPlatinumBuilder.1357672148" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU Make" superClass="com.elmomc.project.CppPlatinumBuilder"/>
+							<tool id="com.elmomc.project.CppPlatinumLinker.539118873" name="Platinum C++ linker" superClass="com.elmomc.project.CppPlatinumLinker"/>
+							<tool id="com.elmomc.project.CppPlatinumAdvCompilerExtended.166840332" name="Platinum C++ compiler" superClass="com.elmomc.project.CppPlatinumAdvCompilerExtended">
+								<inputType id="com.elmomc.project.CppPlatinumSource.1796149606" name="C source files" superClass="com.elmomc.project.CppPlatinumSource"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+		</cconfiguration>
+		<cconfiguration id="com.elmomc.project.CppReleaseConfiguration.239646160">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.elmomc.project.CppReleaseConfiguration.239646160" moduleId="org.eclipse.cdt.core.settings" name="GOLD_R">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="gexe" artifactName="${ProjName}" buildProperties="" cleanCommand="rm -rf ../*.launch" description="Release Gold" id="com.elmomc.project.CppReleaseConfiguration.239646160" name="GOLD_R" parent="com.elmomc.project.CppReleaseConfiguration.239646160" postbuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/generateLaunchConfiguration.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot; &quot;${ConfigName}&quot;" prebuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/cleanPreviousArtifacts.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot;">
+					<folderInfo id="com.elmomc.project.CppReleaseConfiguration.239646160." name="/" resourcePath="">
+						<toolChain id="com.elmomc.project.CppElmoToolchainRelease.91248302" name="Elmo C++ toolchain">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.elmomc.project.Cpp.Gold.Platform.1701461858" isAbstract="false" superClass="com.elmomc.project.Cpp.Gold.Platform"/>
+							<builder buildPath="${workspace_loc:/PVT Files Oceaneering/GOLD_R}" id="com.elmomc.project.CppBuilder.1458616205" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU Make" superClass="com.elmomc.project.CppBuilder"/>
+							<tool id="com.elmomc.project.CppCompiler.639006630" name="Gold C++ compiler" superClass="com.elmomc.project.CppCompiler">
+								<inputType id="com.elmomc.project.CppSource.1005447403" name="C source files" superClass="com.elmomc.project.CppSource"/>
+							</tool>
+							<tool id="com.elmomc.project.CppLinker.506701539" name="Gold C++ linker" superClass="com.elmomc.project.CppLinker"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+		</cconfiguration>
+		<cconfiguration id="com.elmomc.project.CppPlatinumReleaseConfiguration.1103435661">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.elmomc.project.CppPlatinumReleaseConfiguration.1103435661" moduleId="org.eclipse.cdt.core.settings" name="PLATINUM_R">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="pexe" artifactName="${ProjName}" buildProperties="" cleanCommand="rm -rf ../*.launch" description="Release Platinum" id="com.elmomc.project.CppPlatinumReleaseConfiguration.1103435661" name="PLATINUM_R" parent="com.elmomc.project.CppPlatinumReleaseConfiguration.1103435661" postbuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/generateLaunchConfiguration.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot; &quot;${ConfigName}&quot;" prebuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/cleanPreviousArtifacts.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot;">
+					<folderInfo id="com.elmomc.project.CppPlatinumReleaseConfiguration.1103435661." name="/" resourcePath="">
+						<toolChain id="com.elmomc.project.CppPlatinumToolchainRelease.1002118692" name="Elmo C++ toolchain">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.elmomc.project.Cpp.Platinum.Platform.1503404699" isAbstract="false" superClass="com.elmomc.project.Cpp.Platinum.Platform"/>
+							<builder buildPath="${workspace_loc:/PVT Files Oceaneering/PLATINUM_R}" id="com.elmomc.project.CppPlatinumBuilder.1564316777" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU Make" superClass="com.elmomc.project.CppPlatinumBuilder"/>
+							<tool id="com.elmomc.project.CppPlatinumCompiler.1509486191" name="Platinum C++ compiler" superClass="com.elmomc.project.CppPlatinumCompiler">
+								<inputType id="com.elmomc.project.CppPlatinumSource.479232824" name="C source files" superClass="com.elmomc.project.CppPlatinumSource"/>
+							</tool>
+							<tool id="com.elmomc.project.CppPlatinumLinker.1322625821" name="Platinum C++ linker" superClass="com.elmomc.project.CppPlatinumLinker"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="PVT Files Oceaneering.com.elmomc.project.ElmoCppProject.1221869118" name="Elmo C++ project"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="specsFile">
+				<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+		<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="makefileGenerator">
+				<runAction arguments="-E -P -v -dD" command="" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+		<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="specsFile">
+				<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+		<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="specsFile">
+				<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+		<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="specsFile">
+				<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+		<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="specsFile">
+				<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/${specs_file}&quot;'" command="sh" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+		<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileCPP">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="specsFile">
+				<runAction arguments="-c 'g++ -E -P -v -dD &quot;${plugin_state_location}/specs.cpp&quot;'" command="sh" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+		<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileC">
+			<buildOutputProvider>
+				<openAction enabled="true" filePath=""/>
+				<parser enabled="true"/>
+			</buildOutputProvider>
+			<scannerInfoProvider id="specsFile">
+				<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/specs.c&quot;'" command="sh" useDefault="true"/>
+				<parser enabled="true"/>
+			</scannerInfoProvider>
+		</profile>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+</cproject>

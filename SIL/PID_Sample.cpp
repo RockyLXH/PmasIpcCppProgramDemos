@@ -67,7 +67,7 @@ struct Timer
 #endif
 };
 
-#define MEASUREMENT	1
+#define MEASUREMENT	0
 #if	MEASUREMENT
 	#define TIMER()	Timer timer(__PRETTY_FUNCTION__)
 #else
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 		openlog("SIL Program", LOG_CONS | LOG_PID, 0);
 
 		syslog(LOG_DEBUG, "the program <%s> is working\n", argv[0]);
-		//
+
 		// Initialize system, axes and all needed initializations
 		MainInit();
 
@@ -436,6 +436,7 @@ void TerminateApplication(int iSigNum)
 void Emergency_Received(unsigned short usAxisRef, short sEmcyCode)
 {
 	printf("Emergency Message Received on Axis %d. Code: %x\n",usAxisRef,sEmcyCode) ;
+
 }
 
 //static float sigmoid_curve_val[] ={

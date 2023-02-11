@@ -1,20 +1,21 @@
 /*
  * pid.cpp
  *
- *  Created on: Jul 25, 2022
- *      Author: RockyLiu
+ * Created on: Jul 25, 2022
+ * Author: RockyLiu
  */
 
 #include "pid.h"
 
-PIDController::PIDController(double P, double I, double D, double ramp, double limit, double Ts)
-	: P(P), I(I), D(D), output_ramp(ramp), limit(limit), Ts(Ts), error_prev(0.0),
-	  output_prev(0.0), integral_prev(0.0)
+PIDController::PIDController(double P, double I, double D, double ramp,
+		double limit, double Ts) :
+		P(P), I(I), D(D), output_ramp(ramp), limit(limit), Ts(Ts),
+		error_prev(0.0), output_prev(0.0), integral_prev(0.0)
 {
 
 }
 
-double PIDController::operator() (double error)
+double PIDController::operator()(double error)
 {
 	double proportional = P * error;
 
@@ -41,7 +42,4 @@ double PIDController::operator() (double error)
 
 	return output;
 }
-
-
-
 

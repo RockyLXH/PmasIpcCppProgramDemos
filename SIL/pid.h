@@ -1,8 +1,8 @@
 /*
  * pid.h
  *
- *  Created on: Jul 25, 2022
- *      Author: RockyLiu
+ * Created on: Jul 25, 2022
+ * Author: RockyLiu
  */
 
 #pragma once
@@ -11,24 +11,25 @@
 
 class PIDController
 {
-public:
-	PIDController(double P, double I, double D, double ramp, double limit, double Ts);
-	~PIDController() = default;
+	public:
+		PIDController(double P, double I, double D, double ramp, double limit,
+				double Ts);
+		~PIDController() = default;
 
-	PIDController(const PIDController&) = delete;
-	PIDController& operator= (const PIDController&) = delete;
+		PIDController(const PIDController&) = delete;
+		PIDController& operator=(const PIDController&) = delete;
 
-	double operator() (double error);
+		double operator()(double error);
 
-private:
-	double P;
-	double I;
-	double D;
-	double output_ramp;
-	double limit;
-	double Ts;
+	private:
+		double P;
+		double I;
+		double D;
+		double output_ramp;
+		double limit;
+		double Ts;
 
-	double error_prev;
-	double output_prev;
-	double integral_prev;
+		double error_prev;
+		double output_prev;
+		double integral_prev;
 };

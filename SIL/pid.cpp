@@ -9,8 +9,8 @@
 
 PIDController::PIDController(double P, double I, double D, double ramp,
 		double limit, double Ts) :
-		P(P), I(I), D(D), output_ramp(ramp), limit(limit), Ts(Ts),
-		error_prev(0.0), output_prev(0.0), integral_prev(0.0)
+		P(P), I(I), D(D), output_ramp(ramp), limit(limit), Ts(Ts), error_prev(
+				0.0), output_prev(0.0), integral_prev(0.0)
 {
 
 }

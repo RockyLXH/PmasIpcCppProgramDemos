@@ -29,9 +29,9 @@ MotionMode motionMode = PMode;
 /*
  * Algorithms switch in SIL function
  */
-#define ANALOG_COMMAND_FOR_VEL_LOOP 	0
-#define SIN_GEN_FOR_POS_LOOP 			0
-#define VEL_LOOP_PID_CONTROLLER			1
+#define ANALOG_COMMAND_FOR_VEL_LOOP 	0	// in VMode
+#define SIN_GEN_FOR_POS_LOOP 			0	// in PMode
+#define VEL_LOOP_PID_CONTROLLER			1	// in TMode
 
 #define USE_MDS3						0
 

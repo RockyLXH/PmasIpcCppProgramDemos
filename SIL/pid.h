@@ -12,7 +12,7 @@
 class PIDController
 {
 	public:
-		PIDController(double P, double I, double D, double ramp, double limit,
+		explicit PIDController(double P, double I, double D, double ramp, double limit,
 				double Ts);
 		~PIDController() = default;
 

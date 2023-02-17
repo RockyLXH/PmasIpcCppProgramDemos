@@ -16,8 +16,8 @@ void MainInit();
 void MainClose();
 void SILInit();
 void MainLoop();
-int OnRunTimeError(const char *msg, unsigned int uiConnHndl,
-		unsigned short usAxisRef, short sErrorID, unsigned short usStatus);
+int OnRunTimeError(const char *msg, unsigned int uiConnHndl, unsigned short usAxisRef,
+		short sErrorID, unsigned short usStatus);
 void TerminateApplication(int iSigNum);
 void Emergency_Received(unsigned short usAxisRef, short sEmcyCode);
 ;
@@ -36,14 +36,11 @@ int SILCallBackFun(void);
  ============================================================================
  */
 
-bool giTerminate = 0;		// Flag to request program termination
-double target_velocity = 0.0f;
-double prev_target_velocity = 0.0f;
-double acc_dec = 50.0f;
-double acc_dec_time = 0.0f;
-double SineWave_AccFreqNorm = 0.0f;
-double SineWave_Frequency = 1.0f;
-
+bool giTerminate = false;		// Flag to request program termination
+double target_velocity = 0.0;
+double prev_target_velocity = 0.0;
+double vel_ki = 0.5;
+double vel_kp = 0.01;
 /*
  ============================================================================
  Global structures for Elmo's Function Blocks
@@ -58,3 +55,4 @@ MMC_MOTIONPARAMS_SINGLE stSingleDefault;	// Single axis default data
 CMMCRTSingleAxis cRTaxis[MAX_AXES];
 
 MMC_MODBUSREADHOLDINGREGISTERSTABLE_OUT mbus_read_out;
+MMC_MODBUSWRITEHOLDINGREGISTERSTABLE_IN mbus_write_in;

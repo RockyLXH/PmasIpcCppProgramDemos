@@ -24,7 +24,7 @@ enum MotionMode
 	PMode, VMode, TMode
 };
 
-MotionMode motionMode = PMode;
+MotionMode motionMode = TMode;
 
 /*
  * Algorithms switch in SIL function
@@ -81,6 +81,14 @@ struct Timer
 #define TIMER()	Timer timer(__PRETTY_FUNCTION__)
 #else
 #define TIMER(name)
+#endif
+
+/*
+ *  Kp = 0.08, Ki = 1, Ts = 1ms for velocity close loop gains in rad/s units
+ *  Kp = 0.01, Ki = 1, Ts = 1ms for velocity close loop gains in rpm units
+ */
+#if VEL_LOOP_PID_CONTROLLER
+PIDController PID_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
 #endif
 
 /*
@@ -154,19 +162,45 @@ int main(int argc, char *argv[])
 	}
 }
 
+/**
+ * HoldingRegister[0] -> terminate the programm.
+ * HoldingRegister[1] -> set target velocity, unit: rpm.
+ * HoldingRegister[2] -> velocity loop kp.
+ * HoldingRegister[3] -> velocity loop ki.
+ */
 void ReadMbusInput()
 {
-	MBus.MbusReadHoldingRegisterTable(0, 2, mbus_read_out);
+	MBus.MbusReadHoldingRegisterTable(0, 4, mbus_read_out);
 
 	giTerminate = mbus_read_out.regArr[0];
 	target_velocity = (double) mbus_read_out.regArr[1];
+	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 1000.0);
+	vel_ki = static_cast<double>(mbus_read_out.regArr[3] / 1000.0);
+}
 
+void UpdatePID()
+{
+	mbus_write_in.startRef = 2;
+	mbus_write_in.refCnt = 2;
+	mbus_write_in.regArr[0] = static_cast<short>(vel_kp * 1000.0);
+	mbus_write_in.regArr[1] = static_cast<short>(vel_ki * 1000.0);
+
+	MBus.MbusWriteHoldingRegisterTable(mbus_write_in);
 }
 
 void MainLoop()
 {
+	UpdatePID();
+
 	while (!giTerminate) {
+
 		ReadMbusInput();
+
+		if ((PID_velocity.GetKI() != vel_ki) || (PID_velocity.GetKP() != vel_kp)) {
+			PID_velocity.setKI(vel_ki);
+			PID_velocity.setKP(vel_kp);
+		}
+
 		usleep(500000);
 	}
 }
@@ -488,14 +522,6 @@ void Emergency_Received(unsigned short usAxisRef, short sEmcyCode)
 //                0.993, 0.996, 0.997, 1.0};
 //static int index = 0;
 
-/*
- *  Kp = 0.08, Ki = 1, Ts = 1ms for velocity close loop gains in rad/s units
- *  Kp = 0.01, Ki = 1, Ts = 1ms for velocity close loop gains in rpm units
- */
-#if VEL_LOOP_PID_CONTROLLER
-PIDController PID_velocity { 0.01f, 1.0f, 0.0f, 1000.0f, 1.0f, 0.001f };
-#endif
-
 int SILCallBackFun(void)
 {
 	TIMER();
@@ -534,7 +560,7 @@ int SILCallBackFun(void)
 	 */
 
 #if VEL_LOOP_PID_CONTROLLER
-	double actual_velocity = cRTaxis[0].GetActualVelocity(); //* 60 / 10000.0f;
+	double actual_velocity = cRTaxis[0].GetActualVelocity(); // * 60 / 10000.0f;
 
 	double target_current = PID_velocity(target_velocity - actual_velocity);
 

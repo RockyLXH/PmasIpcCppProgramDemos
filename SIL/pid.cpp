@@ -7,12 +7,29 @@
 
 #include "pid.h"
 
-PIDController::PIDController(double P, double I, double D, double ramp,
-		double limit, double Ts) :
-		P(P), I(I), D(D), output_ramp(ramp), limit(limit), Ts(Ts), error_prev(
-				0.0), output_prev(0.0), integral_prev(0.0)
+PIDController::PIDController(double P, double I, double D, double ramp, double limit, double Ts) :
+		P(P), I(I), D(D), output_ramp(ramp), limit(limit), Ts(Ts), error_prev(0.0), output_prev(
+				0.0), integral_prev(0.0)
 {
 
+}
+
+const double& PIDController::GetKP() const
+{
+	return P;
+}
+void PIDController::setKP(const double kp)
+{
+	P = kp;
+}
+
+const double& PIDController::GetKI() const
+{
+	return I;
+}
+void PIDController::setKI(const double ki)
+{
+	I = ki;
 }
 
 double PIDController::operator()(double error)

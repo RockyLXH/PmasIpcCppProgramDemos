@@ -8,30 +8,38 @@
 #include "mmc_definitions.h"
 #include "mmcpplib.h"
 #include <iostream>
-#include <sys/time.h>			// For time structure
-#include <signal.h>				// For Timer mechanism
-#include "PID_Sample.h"		// Application header file.
+#include <sys/time.h>			// for time structure
+#include <signal.h>				// for Timer mechanism
+#include "PID_Sample.h"			// Application header file.
 #include "pid.h"
 #include <chrono>
-#include <syslog.h>			// for system log
+#include <syslog.h>				// for system log
 #include <math.h>
+#include <cstdint>				// for std::uint8_t
 
 /**
- * Motion Mode Selection
+ * Motion mode list
  */
-enum MotionMode
-{
-	PMode, VMode, TMode
+enum class MOTIONMODE
+	: std::uint8_t
+	{
+		PMode, VMode, TMode
 };
 
-MotionMode motionMode = TMode;
-
 /*
- * Algorithms switch in SIL function
+ * Algorithms switcher in SIL function
  */
 #define ANALOG_COMMAND_FOR_VEL_LOOP 	0	// in VMode
 #define SIN_GEN_FOR_POS_LOOP 			0	// in PMode
 #define VEL_LOOP_PID_CONTROLLER			1	// in TMode
+
+#if ANALOG_COMMAND_FOR_VEL_LOOP
+MOTIONMODE motionMode = MOTIONMODE::VMode
+#elif VEL_LOOP_PID_CONTROLLER
+MOTIONMODE motionMode = MOTIONMODE::TMode;
+#elif SIN_GEN_FOR_POS_LOOP
+MOTIONMODE motionMode = MOTIONMODE::PMode;
+#endif
 
 #define USE_MDS3						0
 
@@ -196,9 +204,9 @@ void MainLoop()
 
 		ReadMbusInput();
 
-		if ((PID_velocity.GetKI() != vel_ki) || (PID_velocity.GetKP() != vel_kp)) {
-			PID_velocity.setKI(vel_ki);
-			PID_velocity.setKP(vel_kp);
+		if ((PID_velocity.GetKi() != vel_ki) || (PID_velocity.GetKp() != vel_kp)) {
+			PID_velocity.SetKi(vel_ki);
+			PID_velocity.SetKp(vel_kp);
 		}
 
 		usleep(500000);
@@ -214,21 +222,21 @@ void SILInit()
 		// 1 - 0;
 		// 2 - User
 		switch (motionMode) {
-			case PMode: {
+			case MOTIONMODE::PMode: {
 				cRTaxis[i].SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
 				cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_POSITION_MODE);
 				while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_POSITION_MODE)
 					;
 				break;
 			}
-			case VMode: {
+			case MOTIONMODE::VMode: {
 				cRTaxis[i].SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
 				cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_VELOCITY_MODE);
 				while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_VELOCITY_MODE)
 					;
 				break;
 			}
-			case TMode: {
+			case MOTIONMODE::TMode: {
 				cRTaxis[i].SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
 				cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_TORQUE_MODE);
 				while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_TORQUE_MODE)
@@ -253,17 +261,17 @@ void SILInit()
 
 	for (int i = 0; i < MAX_AXES; ++i) {
 		switch (motionMode) {
-			case PMode: {
+			case MOTIONMODE::PMode: {
 				cRTaxis[i].SetUser607A(0.0f);
 				cRTaxis[i].SetBoolParameter(2, MMC_UCUSER607A_SRC, 0);
 				break;
 			}
-			case VMode: {
+			case MOTIONMODE::VMode: {
 				cRTaxis[i].SetUser60FF(0.0f);
 				cRTaxis[i].SetBoolParameter(2, MMC_UCUSER60FF_SRC, 0);
 				break;
 			}
-			case TMode: {
+			case MOTIONMODE::TMode: {
 				cRTaxis[i].SetUser6071(0.0f);
 				cRTaxis[i].SetBoolParameter(2, MMC_UCUSER6071_SRC, 0);
 				break;
@@ -360,17 +368,17 @@ void MainClose()
 
 	for (auto axis : cRTaxis) {
 		switch (motionMode) {
-			case PMode: {
+			case MOTIONMODE::PMode: {
 				axis.SetUser607A(0.0f);
 				axis.SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
 				break;
 			}
-			case VMode: {
+			case MOTIONMODE::VMode: {
 				axis.SetUser60FF(0.0f);
 				axis.SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
 				break;
 			}
-			case TMode: {
+			case MOTIONMODE::TMode: {
 				axis.SetUser6071(0.0f);
 				axis.SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
 				break;

@@ -7,55 +7,56 @@
 
 #include "pid.h"
 
-PIDController::PIDController(double P, double I, double D, double ramp, double limit, double Ts) :
-		P(P), I(I), D(D), output_ramp(ramp), limit(limit), Ts(Ts), error_prev(0.0), output_prev(
-				0.0), integral_prev(0.0)
+PIDController::PIDController(double kp, double ki, double kd, double ramp, double limit, double ts) :
+		kp_(kp), ki_(ki), kd_(kd), output_ramp_(ramp), limit_(limit), ts_(ts)
 {
 
 }
 
-const double& PIDController::GetKP() const
+const double& PIDController::GetKp() const
 {
-	return P;
-}
-void PIDController::setKP(const double kp)
-{
-	P = kp;
+	return kp_;
 }
 
-const double& PIDController::GetKI() const
+void PIDController::SetKp(const double kp)
 {
-	return I;
+	kp_ = kp;
 }
-void PIDController::setKI(const double ki)
+
+const double& PIDController::GetKi() const
 {
-	I = ki;
+	return ki_;
+}
+
+void PIDController::SetKi(const double ki)
+{
+	ki_ = ki;
 }
 
 double PIDController::operator()(double error)
 {
-	double proportional = P * error;
+	double proportional = kp_ * error;
 
-	double integral = integral_prev + I * Ts * 0.5 * (error + error_prev);
-	integral = _constrain(integral, -limit, limit);
+	double integral = integral_prev_ + ki_ * ts_ * 0.5 * (error + error_prev_);
+	integral = _constrain(integral, -limit_, limit_);
 
-	double derivative = D * (error - error_prev) / Ts;
+	double derivative = kd_ * (error - error_prev_) / ts_;
 
 	double output = proportional + integral + derivative;
-	output = _constrain(output, -limit, limit);
+	output = _constrain(output, -limit_, limit_);
 
-	if (output_ramp > 0) {
-		double output_rate = (output - output_prev) / Ts;
+	if (output_ramp_ > 0) {
+		double output_rate = (output - output_prev_) / ts_;
 
-		if (output_rate > output_ramp)
-			output = output_prev + output_ramp * Ts;
-		else if (output_rate < -output_ramp)
-			output = output_prev - output_ramp * Ts;
+		if (output_rate > output_ramp_)
+			output = output_prev_ + output_ramp_ * ts_;
+		else if (output_rate < -output_ramp_)
+			output = output_prev_ - output_ramp_ * ts_;
 	}
 
-	integral_prev = integral;
-	output_prev = output;
-	error_prev = error;
+	integral_prev_ = integral;
+	output_prev_ = output;
+	error_prev_ = error;
 
 	return output;
 }

@@ -12,7 +12,7 @@
 class PIDController
 {
 	public:
-		explicit PIDController(double P, double I, double D, double ramp, double limit, double Ts);
+		explicit PIDController(double, double, double, double, double, double);
 		~PIDController() = default;
 
 		PIDController(const PIDController&) = delete;
@@ -20,21 +20,21 @@ class PIDController
 
 		double operator()(double error);
 
-		const double& GetKP() const;
-		void setKP(const double);
+		const double& GetKp() const;
+		void SetKp(const double);
 
-		const double& GetKI() const;
-		void setKI(const double);
+		const double& GetKi() const;
+		void SetKi(const double);
 
 	private:
-		double P;
-		double I;
-		double D;
-		double output_ramp;
-		double limit;
-		double Ts;
+		double kp_;
+		double ki_;
+		double kd_;
+		double output_ramp_;
+		double limit_;
+		double ts_;
 
-		double error_prev;
-		double output_prev;
-		double integral_prev;
+		double error_prev_ = 0.;
+		double output_prev_ = 0.;
+		double integral_prev_ = 0.;
 };

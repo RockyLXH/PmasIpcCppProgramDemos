@@ -31,6 +31,7 @@
 *.out
 *.app
 
+# folders
 .metadata
 RemoteSystemsTempFiles
 SIL_BASE

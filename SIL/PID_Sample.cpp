@@ -1,9 +1,13 @@
-/*
- ============================================================================
- Name : PID_Sample.cpp
- Author :	Elmo Motion Control
- Version :	1.0
- ============================================================================
+/**
+ * Name : 		PID_Sample.cpp
+ * Author :		Rocky Liu
+ * Version :	1.0
+ *
+ * Description:	Use Modbus address to control the motion,
+ * 	HoldingRegister[0] -> =1: terminate the programm.
+ * 	HoldingRegister[1] -> set target velocity, unit: rpm.
+ * 	HoldingRegister[2] -> velocity loop kp.
+ * 	HoldingRegister[3] -> velocity loop ki.
  */
 #include "mmc_definitions.h"
 #include "mmcpplib.h"
@@ -108,10 +112,6 @@ PIDController PID_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
  Version:				Version 1.00
  Updated:				29/07/2022
  Modifications:			N/A
-
- Description:			Use Modbus address to control the motion,
- HoldingRegister[0] -> terminate the programm.
- HoldingRegister[1] -> set target velocity, unit: rpm.
 
  The main function of this sample project.
  ============================================================================

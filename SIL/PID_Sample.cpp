@@ -38,7 +38,7 @@ enum class MOTIONMODE
 #define VEL_LOOP_PID_CONTROLLER			1	// in TMode
 
 #if ANALOG_COMMAND_FOR_VEL_LOOP
-MOTIONMODE motionMode = MOTIONMODE::VMode
+MOTIONMODE motionMode = MOTIONMODE::VMode;
 #elif VEL_LOOP_PID_CONTROLLER
 MOTIONMODE motionMode = MOTIONMODE::TMode;
 #elif SIN_GEN_FOR_POS_LOOP
@@ -202,13 +202,15 @@ void MainLoop()
 
 	while (!giTerminate) {
 
+#if VEL_LOOP_PID_CONTROLLER
+
 		ReadMbusInput();
 
 		if ((PID_velocity.GetKi() != vel_ki) || (PID_velocity.GetKp() != vel_kp)) {
 			PID_velocity.SetKi(vel_ki);
 			PID_velocity.SetKp(vel_kp);
 		}
-
+#endif
 		usleep(500000);
 	}
 }
@@ -548,7 +550,7 @@ int SILCallBackFun(void)
 
 #if ANALOG_COMMAND_FOR_VEL_LOOP
 	short aiValue = 0;
-	cRTaxis[0].EthercatReadPIVar(6,0,aiValue);
+	cRTaxis[2].EthercatReadPIVar(6,0,aiValue);
 
 //	std::cout << aiValue << std::endl;
 	if ((aiValue >=-1000) && (aiValue <=1000))
@@ -560,7 +562,7 @@ int SILCallBackFun(void)
 
 	cRTaxis[0].SetUser60FF(dOutput1);
 	cRTaxis[1].SetUser60FF(dOutput1);
-	cRTaxis[2].SetUser60FF(dOutput1);
+//	cRTaxis[2].SetUser60FF(dOutput1);
 #endif
 
 	/*

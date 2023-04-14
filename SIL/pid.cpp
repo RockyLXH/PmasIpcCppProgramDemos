@@ -13,25 +13,6 @@ PIDController::PIDController(double kp, double ki, double kd, double ramp, doubl
 
 }
 
-const double& PIDController::GetKp() const
-{
-	return kp_;
-}
-
-void PIDController::SetKp(const double kp)
-{
-	kp_ = kp;
-}
-
-const double& PIDController::GetKi() const
-{
-	return ki_;
-}
-
-void PIDController::SetKi(const double ki)
-{
-	ki_ = ki;
-}
 
 double PIDController::operator()(double error)
 {

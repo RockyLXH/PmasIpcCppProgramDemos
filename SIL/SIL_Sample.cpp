@@ -1,24 +1,24 @@
 /**
  * Name : 		PID_Sample.cpp
- * Author :		Rocky Liu
+ * Author :		Rocky LIU
  * Version :	1.0
  *
- * Description:	Use Modbus address to control the motion,
- * 	HoldingRegister[0] -> =1: terminate the programm.
- * 	HoldingRegister[1] -> set target velocity, unit: rpm.
- * 	HoldingRegister[2] -> velocity loop kp.
- * 	HoldingRegister[3] -> velocity loop ki.
+ * Description:	Use MODBUS to control the motion,
+ * 	HoldingRegister[0] -> =1: terminate the program.
+ * 	HoldingRegister[1] -> set target velocity, unit: RPM.
+ * 	HoldingRegister[2] -> velocity loop KP.
+ * 	HoldingRegister[3] -> velocity loop KI.
  */
 #include "mmc_definitions.h"
 #include "mmcpplib.h"
 #include <iostream>
 #include <sys/time.h>			// for time structure
 #include <signal.h>				// for Timer mechanism
-#include "PID_Sample.h"			// Application header file.
 #include "pid.h"
 #include <chrono>
 #include <syslog.h>				// for system log
 #include <math.h>
+#include <SIL_Sample.h>			// Application header file.
 #include <cstdint>				// for std::uint8_t
 
 /**
@@ -96,8 +96,8 @@ struct Timer
 #endif
 
 /*
- *  Kp = 0.08, Ki = 1, Ts = 1ms for velocity close loop gains in rad/s units
- *  Kp = 0.01, Ki = 1, Ts = 1ms for velocity close loop gains in rpm units
+ *  KP = 0.08, KI = 1, TS = 1ms for velocity close loop gains in rad/s units
+ *  KP = 0.01, KI = 1, TS = 1ms for velocity close loop gains in rpm units
  */
 #if VEL_LOOP_PID_CONTROLLER
 PIDController PID_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
@@ -181,7 +181,7 @@ void ReadMbusInput()
 	MBus.MbusReadHoldingRegisterTable(0, 4, mbus_read_out);
 
 	giTerminate = mbus_read_out.regArr[0];
-	target_velocity = (double) mbus_read_out.regArr[1];
+	target_velocity = static_cast<double>(mbus_read_out.regArr[1]);
 	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 1000.0);
 	vel_ki = static_cast<double>(mbus_read_out.regArr[3] / 1000.0);
 }

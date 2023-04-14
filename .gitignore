@@ -30,6 +30,12 @@
 *.exe
 *.out
 *.app
+*.pexe
+*.gexe
+
+#Miscellaneous
+*.xml
+*.launch
 
 # folders
 .metadata

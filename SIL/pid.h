@@ -20,11 +20,11 @@ class PIDController
 
 		double operator()(double error);
 
-		const double& GetKp() const;
-		void SetKp(const double);
+		const double& GetKp() const { return kp_; }
+		void SetKp(const double kp) { kp_ = kp; }
 
-		const double& GetKi() const;
-		void SetKi(const double);
+		const double& GetKi() const { return ki_; }
+		void SetKi(const double ki) { ki_ = ki; }
 
 	private:
 		double kp_;

@@ -1,6 +1,6 @@
-#Elmo Pams Demo Programs
+# Elmo Pams Demo Programs
 
-This repo contains some demo programs for Elmo Pmas.
+## This repo contains some demo programs for Elmo Pmas IPC programming..
 
 - circle -> 2 axis circle interpolation motion.
 - cpld_rs232_demo -> RS232 communication for PmasIO version

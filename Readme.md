@@ -1,4 +1,4 @@
-# Elmo Pams Demo Programs
+# Elmo Pmas Demo Programs
 
 ## This repo contains some demo programs for Elmo Pmas IPC programming..
 

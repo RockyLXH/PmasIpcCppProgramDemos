@@ -12,10 +12,10 @@
  Project general functions prototypes
  ============================================================================
  */
-void MainInit();
-void MainClose();
-void SILInit();
-void MainLoop();
+void MainInit(void);
+void MainClose(void);
+void SILInit(void);
+void MainLoop(void);
 int OnRunTimeError(const char *msg, unsigned int uiConnHndl, unsigned short usAxisRef,
 		short sErrorID, unsigned short usStatus);
 void TerminateApplication(int iSigNum);

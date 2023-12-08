@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
  * HoldingRegister[2] -> velocity loop kp.
  * HoldingRegister[3] -> velocity loop ki.
  */
-void ReadMbusInput()
+void ReadMbusInput(void)
 {
 	MBus.MbusReadHoldingRegisterTable(0, 4, mbus_read_out);
 
@@ -184,9 +184,11 @@ void ReadMbusInput()
 	target_velocity = static_cast<double>(mbus_read_out.regArr[1]);
 	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 1000.0);
 	vel_ki = static_cast<double>(mbus_read_out.regArr[3] / 1000.0);
+
+	return;
 }
 
-void UpdatePID()
+void UpdatePID(void)
 {
 	mbus_write_in.startRef = 2;
 	mbus_write_in.refCnt = 2;
@@ -194,9 +196,11 @@ void UpdatePID()
 	mbus_write_in.regArr[1] = static_cast<short>(vel_ki * 1000.0);
 
 	MBus.MbusWriteHoldingRegisterTable(mbus_write_in);
+
+	return;
 }
 
-void MainLoop()
+void MainLoop(void)
 {
 	UpdatePID();
 
@@ -213,12 +217,12 @@ void MainLoop()
 #endif
 		usleep(500000);
 	}
+
+	return;
 }
 
-void SILInit()
+void SILInit(void)
 {
-	static_assert(MAX_AXES >= 1, "configure at least 1 axis by setting 'MAX_AXES' macro!");
-
 	for (int i = 0; i < MAX_AXES; ++i) {
 		// 0 - NC profiler
 		// 1 - 0;
@@ -285,6 +289,8 @@ void SILInit()
 
 	MMC_SetRTUserCallback(gConnHndl, 1); //set user call-back function to highest priority -> 1.
 
+	return;
+
 }
 /*
  ============================================================================
@@ -301,8 +307,11 @@ void SILInit()
  Initilaize the system, including axes, communication, etc.
  ============================================================================
  */
-void MainInit()
+void MainInit(void)
 {
+	// ensure there is at least 1 axes to be configured.
+	static_assert(MAX_AXES >= 1, "configure at least 1 axis by setting 'MAX_AXES' macro!");
+
 	// InitializeCommunication to the GMAS:
 	gConnHndl = cConn.ConnectIPCEx(0x7fffffff, (MMC_MB_CLBK) CallbackFunc);
 
@@ -361,7 +370,7 @@ void MainInit()
  terminated.
  ============================================================================
  */
-void MainClose()
+void MainClose(void)
 {
 //
 //	Here will come code for all closing processes

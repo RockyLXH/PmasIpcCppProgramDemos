@@ -52,39 +52,37 @@ MOTIONMODE motionMode = MOTIONMODE::PMode;
  * use macro define 'TIMER()' in function which needs to be measured
  */
 
-struct Timer
-{
+struct Timer {
 #if USE_MDS3
-		private:
-		const char* m_name;
-		struct timeval start, end;
-		public:
-		Timer(const char* name) :m_name(name)
-		{
-			gettimeofday(&start, NULL);
-		}
+private:
+	const char* m_name;
+	struct timeval start, end;
+public:
+	Timer(const char* name) :m_name(name)
+	{
+		gettimeofday(&start, NULL);
+	}
 
-		~Timer()
-		{
-			gettimeofday(&end, NULL);
-			std::cout << "function: " << m_name << " duration: [" << end.tv_usec - start.tv_usec << " us]\n";
-		}
+	~Timer()
+	{
+		gettimeofday(&end, NULL);
+		std::cout << "function: " << m_name << " duration: [" << end.tv_usec - start.tv_usec << " us]\n";
+	}
 #else
-	private:
-		std::chrono::time_point<std::chrono::steady_clock> start;
-		const char* m_name;
-	public:
-		Timer(const char* name) :
-				m_name(name)
-		{
-			start = std::chrono::high_resolution_clock::now();
-		}
+private:
+	std::chrono::time_point<std::chrono::steady_clock> start;
+	const char* m_name;
+public:
+	Timer(const char* name) :
+			m_name(name) {
+		start = std::chrono::high_resolution_clock::now();
+	}
 
-		~Timer()
-		{
-			auto dur = std::chrono::high_resolution_clock::now() - start;
-			std::cout << "function: " << m_name << " took: [" << dur.count() << " us]\n";
-		}
+	~Timer() {
+		auto dur = std::chrono::high_resolution_clock::now() - start;
+		std::cout << "function: " << m_name << " took: [" << dur.count()
+				<< " us]\n";
+	}
 #endif
 };
 
@@ -117,8 +115,7 @@ PIDController PID_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
  ============================================================================
  */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	try {
 		/*
 		 * open system log file to write.
@@ -145,6 +142,7 @@ int main(int argc, char *argv[])
 		 */
 		openlog("SIL Program", LOG_CONS | LOG_PID, 0);
 
+		// System log file location: /var/log/syslog
 		syslog(LOG_DEBUG, "the program <%s> is working\n", argv[0]);
 
 		// Initialize system, axes and all needed initializations
@@ -159,8 +157,9 @@ int main(int argc, char *argv[])
 		return 0;
 
 	} catch (CMMCException& e) {
-		printf("Exception in function %s, axis ref=%s, err=%d, status=%d, bye\n", e.what(),
-				e.axisName(), e.error(), e.status());
+		syslog( LOG_DEBUG,
+				"Exception in function %s, axis ref=%s, err=%d, status=%d, bye\n",
+				e.what(), e.axisName(), e.error(), e.status());
 		MainClose();
 		exit(0);
 	} catch (...) {
@@ -176,8 +175,7 @@ int main(int argc, char *argv[])
  * HoldingRegister[2] -> velocity loop kp.
  * HoldingRegister[3] -> velocity loop ki.
  */
-void ReadMbusInput(void)
-{
+void ReadMbusInput(void) {
 	MBus.MbusReadHoldingRegisterTable(0, 4, mbus_read_out);
 
 	giTerminate = mbus_read_out.regArr[0];
@@ -188,8 +186,7 @@ void ReadMbusInput(void)
 	return;
 }
 
-void UpdatePID(void)
-{
+void UpdatePID(void) {
 	mbus_write_in.startRef = 2;
 	mbus_write_in.refCnt = 2;
 	mbus_write_in.regArr[0] = static_cast<short>(vel_kp * 1000.0);
@@ -200,8 +197,7 @@ void UpdatePID(void)
 	return;
 }
 
-void MainLoop(void)
-{
+void MainLoop(void) {
 	UpdatePID();
 
 	while (!giTerminate) {
@@ -210,7 +206,8 @@ void MainLoop(void)
 
 		ReadMbusInput();
 
-		if ((PID_velocity.GetKi() != vel_ki) || (PID_velocity.GetKp() != vel_kp)) {
+		if ((PID_velocity.GetKi() != vel_ki)
+				|| (PID_velocity.GetKp() != vel_kp)) {
 			PID_velocity.SetKi(vel_ki);
 			PID_velocity.SetKp(vel_kp);
 		}
@@ -221,34 +218,33 @@ void MainLoop(void)
 	return;
 }
 
-void SILInit(void)
-{
+void SILInit(void) {
 	for (int i = 0; i < MAX_AXES; ++i) {
 		// 0 - NC profiler
 		// 1 - 0;
 		// 2 - User
 		switch (motionMode) {
-			case MOTIONMODE::PMode: {
-				cRTaxis[i].SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
-				cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_POSITION_MODE);
-				while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_POSITION_MODE)
-					;
-				break;
-			}
-			case MOTIONMODE::VMode: {
-				cRTaxis[i].SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
-				cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_VELOCITY_MODE);
-				while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_VELOCITY_MODE)
-					;
-				break;
-			}
-			case MOTIONMODE::TMode: {
-				cRTaxis[i].SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
-				cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_TORQUE_MODE);
-				while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_TORQUE_MODE)
-					;
-				break;
-			}
+		case MOTIONMODE::PMode: {
+			cRTaxis[i].SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
+			cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_POSITION_MODE);
+			while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_POSITION_MODE)
+				;
+			break;
+		}
+		case MOTIONMODE::VMode: {
+			cRTaxis[i].SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
+			cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_VELOCITY_MODE);
+			while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_VELOCITY_MODE)
+				;
+			break;
+		}
+		case MOTIONMODE::TMode: {
+			cRTaxis[i].SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
+			cRTaxis[i].SetOpMode(OPM402_CYCLIC_SYNC_TORQUE_MODE);
+			while (cRTaxis[i].GetOpMode() != OPM402_CYCLIC_SYNC_TORQUE_MODE)
+				;
+			break;
+		}
 		}
 
 		usleep(1000);	// wait some time for ensure the mode changes done.
@@ -267,21 +263,21 @@ void SILInit(void)
 
 	for (int i = 0; i < MAX_AXES; ++i) {
 		switch (motionMode) {
-			case MOTIONMODE::PMode: {
-				cRTaxis[i].SetUser607A(0.0f);
-				cRTaxis[i].SetBoolParameter(2, MMC_UCUSER607A_SRC, 0);
-				break;
-			}
-			case MOTIONMODE::VMode: {
-				cRTaxis[i].SetUser60FF(0.0f);
-				cRTaxis[i].SetBoolParameter(2, MMC_UCUSER60FF_SRC, 0);
-				break;
-			}
-			case MOTIONMODE::TMode: {
-				cRTaxis[i].SetUser6071(0.0f);
-				cRTaxis[i].SetBoolParameter(2, MMC_UCUSER6071_SRC, 0);
-				break;
-			}
+		case MOTIONMODE::PMode: {
+			cRTaxis[i].SetUser607A(0.0f);
+			cRTaxis[i].SetBoolParameter(2, MMC_UCUSER607A_SRC, 0);
+			break;
+		}
+		case MOTIONMODE::VMode: {
+			cRTaxis[i].SetUser60FF(0.0f);
+			cRTaxis[i].SetBoolParameter(2, MMC_UCUSER60FF_SRC, 0);
+			break;
+		}
+		case MOTIONMODE::TMode: {
+			cRTaxis[i].SetUser6071(0.0f);
+			cRTaxis[i].SetBoolParameter(2, MMC_UCUSER6071_SRC, 0);
+			break;
+		}
 		}
 	}
 
@@ -307,8 +303,7 @@ void SILInit(void)
  Initilaize the system, including axes, communication, etc.
  ============================================================================
  */
-void MainInit(void)
-{
+void MainInit(void) {
 	// ensure there is at least 1 axes to be configured.
 	static_assert(MAX_AXES >= 1, "configure at least 1 axis by setting 'MAX_AXES' macro!");
 
@@ -370,8 +365,7 @@ void MainInit(void)
  terminated.
  ============================================================================
  */
-void MainClose(void)
-{
+void MainClose(void) {
 //
 //	Here will come code for all closing processes
 //
@@ -379,21 +373,21 @@ void MainClose(void)
 
 	for (auto axis : cRTaxis) {
 		switch (motionMode) {
-			case MOTIONMODE::PMode: {
-				axis.SetUser607A(0.0f);
-				axis.SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
-				break;
-			}
-			case MOTIONMODE::VMode: {
-				axis.SetUser60FF(0.0f);
-				axis.SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
-				break;
-			}
-			case MOTIONMODE::TMode: {
-				axis.SetUser6071(0.0f);
-				axis.SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
-				break;
-			}
+		case MOTIONMODE::PMode: {
+			axis.SetUser607A(0.0f);
+			axis.SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
+			break;
+		}
+		case MOTIONMODE::VMode: {
+			axis.SetUser60FF(0.0f);
+			axis.SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
+			break;
+		}
+		case MOTIONMODE::TMode: {
+			axis.SetUser6071(0.0f);
+			axis.SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
+			break;
+		}
 		}
 		axis.PowerOff();
 
@@ -419,43 +413,43 @@ void MainClose(void)
 //	Return Value	:	int																							//
 //	Modifications:	:	N/A																							//
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int CallbackFunc(unsigned char* recvBuffer, short recvBufferSize, void* lpsock)
-{
+int CallbackFunc(unsigned char* recvBuffer, short recvBufferSize,
+		void* lpsock) {
 	// Which function ID was received ...
 	switch (recvBuffer[1]) {
-		case EMCY_EVT:
-			//
-			// Please note - The emergency event was registered.
-			// printf("Emergency Event received\r\n") ;
-			break;
-		case MOTIONENDED_EVT:
-			printf("Motion Ended Event received\r\n");
-			break;
-		case HBEAT_EVT:
-			printf("H Beat Fail Event received\r\n");
-			break;
-		case PDORCV_EVT:
-			printf("PDO Received Event received - Updating Inputs\r\n");
-			break;
-		case DRVERROR_EVT:
-			printf("Drive Error Received Event received\r\n");
-			break;
-		case HOME_ENDED_EVT:
-			printf("Home Ended Event received\r\n");
-			break;
-		case SYSTEMERROR_EVT:
-			printf("System Error Event received\r\n");
-			break;
-			/* This is commented as a specific event was written for this function. Once it occurs
-			 * the ModbusWrite_Received will be called
-			 case MODBUS_WRITE_EVT:
-			 // TODO Update additional data to be read such as function parameters.
-			 // TODO Remove return 0 if you want to handle as part of callback.
-			 return 0;
-			 printf("Modbus Write Event received - Updating Outputs\r\n") ;
+	case EMCY_EVT:
+		//
+		// Please note - The emergency event was registered.
+		// printf("Emergency Event received\r\n") ;
+		break;
+	case MOTIONENDED_EVT:
+		printf("Motion Ended Event received\r\n");
+		break;
+	case HBEAT_EVT:
+		printf("H Beat Fail Event received\r\n");
+		break;
+	case PDORCV_EVT:
+		printf("PDO Received Event received - Updating Inputs\r\n");
+		break;
+	case DRVERROR_EVT:
+		printf("Drive Error Received Event received\r\n");
+		break;
+	case HOME_ENDED_EVT:
+		printf("Home Ended Event received\r\n");
+		break;
+	case SYSTEMERROR_EVT:
+		printf("System Error Event received\r\n");
+		break;
+		/* This is commented as a specific event was written for this function. Once it occurs
+		 * the ModbusWrite_Received will be called
+		 case MODBUS_WRITE_EVT:
+		 // TODO Update additional data to be read such as function parameters.
+		 // TODO Remove return 0 if you want to handle as part of callback.
+		 return 0;
+		 printf("Modbus Write Event received - Updating Outputs\r\n") ;
 
-			 break ;
-			 */
+		 break ;
+		 */
 	}
 
 	return 1;
@@ -473,11 +467,11 @@ int CallbackFunc(unsigned char* recvBuffer, short recvBufferSize, void* lpsock)
 //
 //	Modifications:	:	N/A
 //////////////////////////////////////////////////////////////////////
-int OnRunTimeError(const char *msg, unsigned int uiConnHndl, unsigned short usAxisRef,
-		short sErrorID, unsigned short usStatus)
-{
+int OnRunTimeError(const char *msg, unsigned int uiConnHndl,
+		unsigned short usAxisRef, short sErrorID, unsigned short usStatus) {
 	MMC_CloseConnection(uiConnHndl);
-	printf("MMCPPExitClbk: Run time Error in function %s, axis ref=%d, err=%d, status=%d, bye\n",
+	printf(
+			"MMCPPExitClbk: Run time Error in function %s, axis ref=%d, err=%d, status=%d, bye\n",
 			msg, usAxisRef, sErrorID, usStatus);
 	exit(0);
 }
@@ -494,21 +488,20 @@ int OnRunTimeError(const char *msg, unsigned int uiConnHndl, unsigned short usAx
 //
 //	Modifications:	:	N/A
 //////////////////////////////////////////////////////////////////////
-void TerminateApplication(int iSigNum)
-{
+void TerminateApplication(int iSigNum) {
 	//
 	printf("In Terminate Application ...\n");
 	giTerminate = 1;
 	sigignore(SIGALRM);
 	//
 	switch (iSigNum) {
-		// Handle ctrl+c.
-		case SIGINT:
-			// TODO Close what needs to be closed before program termination.
-			exit(0);
-			break;
-		default:
-			break;
+	// Handle ctrl+c.
+	case SIGINT:
+		// TODO Close what needs to be closed before program termination.
+		exit(0);
+		break;
+	default:
+		break;
 	}
 	return;
 }
@@ -525,9 +518,9 @@ void TerminateApplication(int iSigNum)
 //
 //	Modifications:	:	N/A
 //////////////////////////////////////////////////////////////////////
-void Emergency_Received(unsigned short usAxisRef, short sEmcyCode)
-{
-	printf("Emergency Message Received on Axis %d. Code: %x\n", usAxisRef, sEmcyCode);
+void Emergency_Received(unsigned short usAxisRef, short sEmcyCode) {
+	printf("Emergency Message Received on Axis %d. Code: %x\n", usAxisRef,
+			sEmcyCode);
 
 }
 
@@ -541,8 +534,7 @@ void Emergency_Received(unsigned short usAxisRef, short sEmcyCode)
 //                0.993, 0.996, 0.997, 1.0};
 //static int index = 0;
 
-int SILCallBackFun(void)
-{
+int SILCallBackFun(void) {
 	TIMER();
 
 //	if (b) {

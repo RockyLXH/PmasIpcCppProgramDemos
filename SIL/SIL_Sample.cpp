@@ -36,12 +36,15 @@ enum class MOTIONMODE
 #define ANALOG_COMMAND_FOR_VEL_LOOP 	0	// in VMode
 #define SIN_GEN_FOR_POS_LOOP 			0	// in PMode
 #define VEL_LOOP_PID_CONTROLLER			1	// in TMode
+#define TEST							0	// in test mode
 
 #if ANALOG_COMMAND_FOR_VEL_LOOP
 MOTIONMODE motionMode = MOTIONMODE::VMode;
 #elif VEL_LOOP_PID_CONTROLLER
 MOTIONMODE motionMode = MOTIONMODE::TMode;
 #elif SIN_GEN_FOR_POS_LOOP
+MOTIONMODE motionMode = MOTIONMODE::PMode;
+#elif TEST
 MOTIONMODE motionMode = MOTIONMODE::PMode;
 #endif
 
@@ -534,16 +537,22 @@ void Emergency_Received(unsigned short usAxisRef, short sEmcyCode) {
 //                0.993, 0.996, 0.997, 1.0};
 //static int index = 0;
 
-int SILCallBackFun(void) {
-	TIMER();
+#if TEST
+bool b = false;
+#endif
 
-//	if (b) {
-//		cRTaxis[1].EthercatWritePIVar(3, 0);
-//		b = false;
-//	} else {
-//		cRTaxis[1].EthercatWritePIVar(3, 65536);
-//		b = true;
-//	}
+int SILCallBackFun(void) {
+//	TIMER();
+
+#if TEST
+	if (b) {
+		cRTaxis[0].EthercatWritePIVar(4, 0);
+		b = false;
+	} else {
+		cRTaxis[0].EthercatWritePIVar(4, 65536);
+		b = true;
+	}
+#endif
 
 	/*
 	 * Analog inputs commands for velocity loop

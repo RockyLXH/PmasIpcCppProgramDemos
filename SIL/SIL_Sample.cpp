@@ -35,8 +35,8 @@ enum class MOTIONMODE
  */
 #define ANALOG_COMMAND_FOR_VEL_LOOP 	0	// in VMode
 #define SIN_GEN_FOR_POS_LOOP 			0	// in PMode
-#define VEL_LOOP_PID_CONTROLLER			1	// in TMode
-#define TEST							0	// in test mode
+#define VEL_LOOP_PID_CONTROLLER			0	// in TMode
+#define TEST							1	// in test mode
 
 #if ANALOG_COMMAND_FOR_VEL_LOOP
 MOTIONMODE motionMode = MOTIONMODE::VMode;
@@ -200,22 +200,39 @@ void UpdatePID(void) {
 	return;
 }
 
+void terminate_app(int)
+{
+	printf("\nterminating application...... \n");
+	giTerminate = true;
+
+	sleep(1);
+
+	return;
+}
+
 void MainLoop(void) {
-	UpdatePID();
+
+	struct sigaction SigAction;
+
+	SigAction.sa_handler = terminate_app;
+
+	sigaction(SIGINT, &SigAction, NULL);
 
 	while (!giTerminate) {
 
-#if VEL_LOOP_PID_CONTROLLER
-
 		ReadMbusInput();
 
+#if VEL_LOOP_PID_CONTROLLER
 		if ((PID_velocity.GetKi() != vel_ki)
 				|| (PID_velocity.GetKp() != vel_kp)) {
 			PID_velocity.SetKi(vel_ki);
 			PID_velocity.SetKp(vel_kp);
 		}
 #endif
+
+		UpdatePID();
 		usleep(500000);
+
 	}
 
 	return;
@@ -251,11 +268,12 @@ void SILInit(void) {
 		}
 
 		usleep(1000);	// wait some time for ensure the mode changes done.
-
+#if TEST == 0
 		cRTaxis[i].PowerOn();
 
 		while (!(cRTaxis[i].ReadStatus() & NC_AXIS_STAND_STILL_MASK))
 			usleep(10000);
+#endif
 
 //			cRTaxis[0].MoveAbsolute(5000, 10000.0);
 //
@@ -267,18 +285,18 @@ void SILInit(void) {
 	for (int i = 0; i < MAX_AXES; ++i) {
 		switch (motionMode) {
 		case MOTIONMODE::PMode: {
-			cRTaxis[i].SetUser607A(0.0f);
 			cRTaxis[i].SetBoolParameter(2, MMC_UCUSER607A_SRC, 0);
+			cRTaxis[i].SetUser607A(0.0f);
 			break;
 		}
 		case MOTIONMODE::VMode: {
-			cRTaxis[i].SetUser60FF(0.0f);
 			cRTaxis[i].SetBoolParameter(2, MMC_UCUSER60FF_SRC, 0);
+			cRTaxis[i].SetUser60FF(0.0f);
 			break;
 		}
 		case MOTIONMODE::TMode: {
-			cRTaxis[i].SetUser6071(0.0f);
 			cRTaxis[i].SetBoolParameter(2, MMC_UCUSER6071_SRC, 0);
+			cRTaxis[i].SetUser6071(0.0f);
 			break;
 		}
 		}
@@ -374,29 +392,31 @@ void MainClose(void) {
 //
 	MMC_DestroySYNCTimer(gConnHndl);
 
-	for (auto axis : cRTaxis) {
+	for (int i = 0; i < MAX_AXES; ++i) {
 		switch (motionMode) {
 		case MOTIONMODE::PMode: {
-			axis.SetUser607A(0.0f);
-			axis.SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
+			cRTaxis[i].SetUser607A(0.0f);
 			break;
 		}
 		case MOTIONMODE::VMode: {
-			axis.SetUser60FF(0.0f);
-			axis.SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
+			cRTaxis[i].SetUser60FF(0.0f);
 			break;
 		}
 		case MOTIONMODE::TMode: {
-			axis.SetUser6071(0.0f);
-			axis.SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
+			cRTaxis[i].SetUser6071(0.0f);
 			break;
 		}
 		}
-		axis.PowerOff();
 
-		while (!(axis.ReadStatus() & NC_AXIS_DISABLED_MASK))
+#if TEST == 0
+		cRTaxis[i].PowerOff();
+
+		while (!(cRTaxis[i].ReadStatus() & NC_AXIS_DISABLED_MASK))
 			usleep(10000);
+#endif
+
 	}
+
 
 	MBus.MbusStopServer();
 	MMC_CloseConnection(gConnHndl);
@@ -493,7 +513,7 @@ int OnRunTimeError(const char *msg, unsigned int uiConnHndl,
 //////////////////////////////////////////////////////////////////////
 void TerminateApplication(int iSigNum) {
 	//
-	printf("In Terminate Application ...\n");
+	printf("\nIn Terminate Application ...\n");
 	giTerminate = 1;
 	sigignore(SIGALRM);
 	//
@@ -546,10 +566,12 @@ int SILCallBackFun(void) {
 
 #if TEST
 	if (b) {
-		cRTaxis[0].EthercatWritePIVar(4, 0);
+//		cRTaxis[0].EthercatWritePIVar(4, 0);
+		cRTaxis[0].SetUser607A(0);
 		b = false;
 	} else {
-		cRTaxis[0].EthercatWritePIVar(4, 65536);
+//		cRTaxis[0].EthercatWritePIVar(4, 65536);
+		cRTaxis[0].SetUser607A(10000);
 		b = true;
 	}
 #endif

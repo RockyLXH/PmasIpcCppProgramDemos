@@ -503,7 +503,7 @@ int OnRunTimeError(const char *msg, unsigned int uiConnHndl,
 //////////////////////////////////////////////////////////////////////
 void TerminateApplication(int iSigNum) {
 	//
-	printf("\nIn Terminate Application ...\n");
+	printf("\nTerminating Application ...\n");
 	giTerminate = true;
 	sigignore(SIGALRM);
 	//
@@ -511,6 +511,7 @@ void TerminateApplication(int iSigNum) {
 	// Handle ctrl+c.
 	case SIGINT:
 		// TODO Close what needs to be closed before program termination.
+		sleep(1); // to wait the program finish the rest part - MainClose() and etc.
 		exit(0);
 		break;
 	default:

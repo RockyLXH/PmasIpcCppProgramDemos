@@ -200,21 +200,11 @@ void UpdatePID(void) {
 	return;
 }
 
-void terminate_app(int)
-{
-	printf("\nterminating application...... \n");
-	giTerminate = true;
-
-	sleep(1);
-
-	return;
-}
-
 void MainLoop(void) {
 
 	struct sigaction SigAction;
 
-	SigAction.sa_handler = terminate_app;
+	SigAction.sa_handler = TerminateApplication;
 
 	sigaction(SIGINT, &SigAction, NULL);
 
@@ -514,7 +504,7 @@ int OnRunTimeError(const char *msg, unsigned int uiConnHndl,
 void TerminateApplication(int iSigNum) {
 	//
 	printf("\nIn Terminate Application ...\n");
-	giTerminate = 1;
+	giTerminate = true;
 	sigignore(SIGALRM);
 	//
 	switch (iSigNum) {

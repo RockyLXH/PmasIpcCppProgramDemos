@@ -20,6 +20,7 @@
 #include <math.h>
 #include <SIL_Sample.h>			// Application header file.
 #include <cstdint>				// for std::uint8_t
+#include <fstream>				// for read / write file
 
 /**
  * Motion mode list
@@ -37,6 +38,15 @@ enum class MOTIONMODE
 #define SIN_GEN_FOR_POS_LOOP 			0	// in PMode
 #define VEL_LOOP_PID_CONTROLLER			0	// in TMode
 #define TEST							1	// in test mode
+
+
+#if TEST
+bool b = false;
+static unsigned int cnt = 0;
+static unsigned int record_array[100000] = {0};
+bool is_finish = false;
+std::fstream file;
+#endif
 
 #if ANALOG_COMMAND_FOR_VEL_LOOP
 MOTIONMODE motionMode = MOTIONMODE::VMode;
@@ -130,7 +140,7 @@ int main(int argc, char *argv[]) {
 		 *     Open the connection immediately (normally, the connection is opened when the first message is logged).
 		 *
 		 *  LOG_NOWAIT
-		 *     Don¡¯t  wait  for  child processes that may have been created while logging the message.  (The GNU C library does not create a
+		 *     Do not wait for child processes that may have been created while logging the message.  (The GNU C library does not create a
 		 *     child process, so this option has no effect on Linux.)
 		 *
 		 *  LOG_ODELAY
@@ -211,6 +221,12 @@ void MainLoop(void) {
 	while (!giTerminate) {
 
 		ReadMbusInput();
+#if TEST
+		if (is_finish) {
+			std::cout << "SIL Test is done\n";
+			break;
+		}
+#endif
 
 #if VEL_LOOP_PID_CONTROLLER
 		if ((PID_velocity.GetKi() != vel_ki)
@@ -407,6 +423,18 @@ void MainClose(void) {
 
 	}
 
+#if TEST
+	file.open("record.txt",ios::out);
+	if (!file.is_open())
+		std::cerr << "can not open the file\n";
+
+	for (int i = 0; i < 100000; ++i) {
+		file << record_array[i] << endl;
+	}
+	file.flush();
+	file.close();
+	std::cout << "write file done\n";
+#endif
 
 	MBus.MbusStopServer();
 	MMC_CloseConnection(gConnHndl);
@@ -511,7 +539,7 @@ void TerminateApplication(int iSigNum) {
 	// Handle ctrl+c.
 	case SIGINT:
 		// TODO Close what needs to be closed before program termination.
-		sleep(1); // to wait the program finish the rest part - MainClose() and etc.
+		sleep(10); // to wait the program finish the rest part - MainClose() and etc.
 		exit(0);
 		break;
 	default:
@@ -548,22 +576,24 @@ void Emergency_Received(unsigned short usAxisRef, short sEmcyCode) {
 //                0.993, 0.996, 0.997, 1.0};
 //static int index = 0;
 
-#if TEST
-bool b = false;
-#endif
-
 int SILCallBackFun(void) {
 //	TIMER();
 
 #if TEST
-	if (b) {
-//		cRTaxis[0].EthercatWritePIVar(4, 0);
-		cRTaxis[0].SetUser607A(0);
-		b = false;
+	if (cnt < 100000) {
+		if (b) {
+	//		cRTaxis[0].EthercatWritePIVar(4, 0);
+			cRTaxis[0].SetUser607A(0);
+			b = false;
+			record_array[cnt++] = cRTaxis[0].GetUser607A();
+		} else {
+	//		cRTaxis[0].EthercatWritePIVar(4, 65536);
+			cRTaxis[0].SetUser607A(10000);
+			b = true;
+			record_array[cnt++] = cRTaxis[0].GetUser607A();
+		}
 	} else {
-//		cRTaxis[0].EthercatWritePIVar(4, 65536);
-		cRTaxis[0].SetUser607A(10000);
-		b = true;
+		is_finish = true;
 	}
 #endif
 
@@ -606,6 +636,8 @@ int SILCallBackFun(void) {
 
 #if SIN_GEN_FOR_POS_LOOP
 	double rtb_SineWave;
+	double SineWave_AccFreqNorm = 0.0;
+	double SineWave_Frequency = 1.0;
 	int rtb_DataTypeConversion;
 
 	// S-Function (sdspsine2): '<Root>/Sine Wave'

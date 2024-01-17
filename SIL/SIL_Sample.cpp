@@ -41,9 +41,10 @@ enum class MOTIONMODE
 
 
 #if TEST
+#define TEST_COUNT		200000
 bool b = false;
 static unsigned int cnt = 0;
-static unsigned int record_array[100000] = {0};
+static unsigned int record_array[TEST_COUNT] = {0};
 bool is_finish = false;
 std::fstream file;
 #endif
@@ -428,7 +429,7 @@ void MainClose(void) {
 	if (!file.is_open())
 		std::cerr << "can not open the file\n";
 
-	for (int i = 0; i < 100000; ++i) {
+	for (int i = 0; i < TEST_COUNT; ++i) {
 		file << record_array[i] << endl;
 	}
 	file.flush();
@@ -580,7 +581,7 @@ int SILCallBackFun(void) {
 //	TIMER();
 
 #if TEST
-	if (cnt < 100000) {
+	if (cnt < TEST_COUNT) {
 		if (b) {
 	//		cRTaxis[0].EthercatWritePIVar(4, 0);
 			cRTaxis[0].SetUser607A(0);

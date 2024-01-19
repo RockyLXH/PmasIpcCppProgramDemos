@@ -28,7 +28,6 @@
  The main function of this sample project.
 ============================================================================
 */
-
 int main()
 {
 	try
@@ -48,13 +47,13 @@ int main()
 		char received_bytes = 0;
 		CMaestroSerialPort tx, rx;
 
-		if(!open_uart_port(&tx, 0, 115200, "Normal")) {
+		if(!open_uart_port(tx, 0, 115200, NORMAL)) {
 			cout << "port tx open failed " << rc << endl;
 			exit(-1);
 		}	
 		cout << "port tx opened as " << rc << endl;
 
-		if(!open_uart_port(&rx, 1, 115200, "Normal")) {
+		if(!open_uart_port(rx, 1, 115200, NORMAL)) {
 			cout << "port rx open failed " << rc << endl;
 			exit(-1);
 		}
@@ -123,6 +122,9 @@ int main()
 */
 static void MainInit()
 {
+
+	// ensure there is at least 1 axes to be configured.
+	static_assert(MAX_AXES >= 1, "configure at least 1 axis by setting 'MAX_AXES' macro!");
 	//
 	// Here will come initialization code for all system, axes, communication etc.
 	//
@@ -298,16 +300,13 @@ static void Emergency_Received(unsigned short usAxisRef, short sEmcyCode)
 	printf("Emergency Message Received on Axis %d. Code: %x\n",usAxisRef,sEmcyCode) ;
 }
 
-static int open_uart_port(CMaestroSerialPort *sp, const int port_num, const unsigned int baud_rate, const char *mode)
+static int open_uart_port(CMaestroSerialPort& sp, const int portNumber, const unsigned int baudrate, const unsigned short mode)
 {
 
 	CMaestroSerialPort::SMaestroSerialPortCfg cfg;
 
-	if(strcmp("Normal", mode) == 0)
-		cfg.mode = sp->Normal;
-	else
-		cfg.mode = sp->Enhanced;
+	cfg.mode = (CMaestroSerialPort::Mode)mode;
+	cfg.speed = baudrate;
 
-	cfg.speed = baud_rate;
-	return sp->Open(port_num, cfg);
+	return sp.Open(portNumber, cfg);
 }

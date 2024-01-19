@@ -18,7 +18,7 @@ static int OnRunTimeError(const char *msg,  unsigned int uiConnHndl, unsigned sh
 static void TerminateApplication(int iSigNum);
 static void Emergency_Received(unsigned short usAxisRef, short sEmcyCode) ;;
 static int  CallbackFunc(unsigned char* recvBuffer, short recvBufferSize,void* lpsock);
-static int open_uart_port(CMaestroSerialPort *sp, const int port_num, const unsigned int baud_rate, const char *mode);
+static int open_uart_port(CMaestroSerialPort& sp, const int portNumber, const unsigned int baudrate, const unsigned short mode);
 
 /*
 ============================================================================
@@ -26,6 +26,9 @@ static int open_uart_port(CMaestroSerialPort *sp, const int port_num, const unsi
 ============================================================================
 */
 #define 	MAX_AXES				2		// number of Physical axes in the system. TODO Update MAX_AXES accordingly
+
+#define		NORMAL					0
+#define		ENHANCED				1
 /*
 ============================================================================
  Application global variables

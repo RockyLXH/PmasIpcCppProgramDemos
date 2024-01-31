@@ -25,19 +25,21 @@
 /**
  * Motion mode list
  */
-enum class MOTIONMODE
-	: std::uint8_t
-	{
-		PMode, VMode, TMode
+enum  MOTIONMODE
+{
+	PMode,
+	VMode,
+	TMode
 };
 
 /*
  * Algorithms switcher in SIL function
  */
 #define ANALOG_COMMAND_FOR_VEL_LOOP 	0	// in VMode
-#define SIN_GEN_FOR_POS_LOOP 			0	// in PMode
-#define VEL_LOOP_PID_CONTROLLER			0	// in TMode
+#define SIN_GEN_FOR_POS_LOOP 		0	// in PMode
+#define VEL_LOOP_PID_CONTROLLER		0	// in TMode
 #define TEST							1	// in test mode
+#define IS_P_DRIVE					0	// use platinum drive
 
 
 #if TEST
@@ -367,7 +369,11 @@ void MainInit(void) {
 	char sAxisName[20];
 
 	for (int i = 0; i < MAX_AXES; ++i) {
+#if IS_P_DRIVE
+		sprintf(sAxisName, "a%02d.Axis 1", i + 1);
+#else
 		sprintf(sAxisName, "a%02d", i + 1);
+#endif
 		cRTaxis[i].InitAxisData(sAxisName, gConnHndl);
 		cRTaxis[i].SetDefaultParams(stSingleDefault);
 

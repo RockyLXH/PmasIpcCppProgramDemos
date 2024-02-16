@@ -18,7 +18,7 @@ double PIDController::operator()(double error)
 {
 	double proportional = kp_ * error;
 
-	double integral = integral_prev_ + ki_ * ts_ * 0.5 * (error + error_prev_);
+	double integral = integral_prev_ + ki_ * ts_ * 0.5f * (error + error_prev_);
 	integral = _constrain(integral, -limit_, limit_);
 
 	double derivative = kd_ * (error - error_prev_) / ts_;

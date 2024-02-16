@@ -39,8 +39,8 @@ int SILCallBackFun(void);
 bool giTerminate = false;		// Flag to request program termination
 double target_velocity = 0.0;
 double prev_target_velocity = 0.0;
-double vel_ki = 0.5;
-double vel_kp = 0.01;
+double vel_ki = 0.0;
+double vel_kp = 0.0001;
 /*
  ============================================================================
  Global structures for Elmo's Function Blocks

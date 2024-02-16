@@ -36,28 +36,24 @@ enum  MOTIONMODE
  * Algorithms switcher in SIL function
  */
 #define ANALOG_COMMAND_FOR_VEL_LOOP 	0	// in VMode
-#define SIN_GEN_FOR_POS_LOOP 		0	// in PMode
-#define VEL_LOOP_PID_CONTROLLER		0	// in TMode
-#define TEST							1	// in test mode
-#define IS_P_DRIVE					0	// use platinum drive
+#define SIN_GEN_FOR_POS_LOOP 			0	// in PMode
+#define VEL_LOOP_PID_CONTROLLER			0	// in TMode
+#define RATCHET_EFFECT					1	// in TMode
+#define TEST							0	// in test mode
 
+#define IS_P_DRIVE						0	// use platinum drive
 
-#if TEST
 #define TEST_COUNT		200000
-bool b = false;
-static unsigned int cnt = 0;
+
 static unsigned int record_array[TEST_COUNT] = {0};
-bool is_finish = false;
-std::fstream file;
-#endif
+static bool is_test_finished = false;
+static std::fstream file;
 
 #if ANALOG_COMMAND_FOR_VEL_LOOP
 MOTIONMODE motionMode = MOTIONMODE::VMode;
-#elif VEL_LOOP_PID_CONTROLLER
+#elif VEL_LOOP_PID_CONTROLLER || RATCHET_EFFECT
 MOTIONMODE motionMode = MOTIONMODE::TMode;
-#elif SIN_GEN_FOR_POS_LOOP
-MOTIONMODE motionMode = MOTIONMODE::PMode;
-#elif TEST
+#elif SIN_GEN_FOR_POS_LOOP || TEST
 MOTIONMODE motionMode = MOTIONMODE::PMode;
 #endif
 
@@ -107,14 +103,6 @@ public:
 #define TIMER()	Timer timer(__PRETTY_FUNCTION__)
 #else
 #define TIMER(name)
-#endif
-
-/*
- *  KP = 0.08, KI = 1, TS = 1ms for velocity close loop gains in rad/s units
- *  KP = 0.01, KI = 1, TS = 1ms for velocity close loop gains in rpm units
- */
-#if VEL_LOOP_PID_CONTROLLER
-PIDController PID_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
 #endif
 
 /*
@@ -196,8 +184,10 @@ void ReadMbusInput(void) {
 
 	giTerminate = mbus_read_out.regArr[0];
 	target_velocity = static_cast<double>(mbus_read_out.regArr[1]);
-	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 1000.0);
+	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 100000.0);
 	vel_ki = static_cast<double>(mbus_read_out.regArr[3] / 1000.0);
+
+//	std::cout << vel_kp << " " << vel_ki << " " << " | ";
 
 	return;
 }
@@ -205,8 +195,10 @@ void ReadMbusInput(void) {
 void UpdatePID(void) {
 	mbus_write_in.startRef = 2;
 	mbus_write_in.refCnt = 2;
-	mbus_write_in.regArr[0] = static_cast<short>(vel_kp * 1000.0);
+	mbus_write_in.regArr[0] = static_cast<short>(vel_kp * 100000.0);
 	mbus_write_in.regArr[1] = static_cast<short>(vel_ki * 1000.0);
+
+//	std::cout << mbus_write_in.regArr[0] << " " << mbus_write_in.regArr[1] << std::endl;
 
 	MBus.MbusWriteHoldingRegisterTable(mbus_write_in);
 
@@ -225,7 +217,7 @@ void MainLoop(void) {
 
 		ReadMbusInput();
 #if TEST
-		if (is_finish) {
+		if (is_test_finished) {
 			std::cout << "SIL Test is done\n";
 			break;
 		}
@@ -311,7 +303,7 @@ void SILInit(void) {
 		}
 	}
 
-	MMC_CreateSYNCTimer(gConnHndl, SILCallBackFun, 1);
+	MMC_CreateSYNCTimer(gConnHndl, SILCallBackFun, 1); // sync timer 1X
 
 	MMC_SetRTUserCallback(gConnHndl, 1); //set user call-back function to highest priority -> 1.
 
@@ -546,8 +538,6 @@ void TerminateApplication(int iSigNum) {
 	// Handle ctrl+c.
 	case SIGINT:
 		// TODO Close what needs to be closed before program termination.
-		sleep(10); // to wait the program finish the rest part - MainClose() and etc.
-		exit(0);
 		break;
 	default:
 		break;
@@ -573,75 +563,8 @@ void Emergency_Received(unsigned short usAxisRef, short sEmcyCode) {
 
 }
 
-//static float sigmoid_curve_val[] ={
-//                0.018, 0.029, 0.047, 0.076, 0.119, 0.182,
-//
-//                0.269, 0.377, 0.500, 0.622, 0.731, 0.8178,
-//
-//                0.881, 0.924, 0.952, 0.970, 0.982, 0.989,
-//
-//                0.993, 0.996, 0.997, 1.0};
-//static int index = 0;
-
-int SILCallBackFun(void) {
-//	TIMER();
-
-#if TEST
-	if (cnt < TEST_COUNT) {
-		if (b) {
-	//		cRTaxis[0].EthercatWritePIVar(4, 0);
-			cRTaxis[0].SetUser607A(0);
-			b = false;
-			record_array[cnt++] = cRTaxis[0].GetUser607A();
-		} else {
-	//		cRTaxis[0].EthercatWritePIVar(4, 65536);
-			cRTaxis[0].SetUser607A(10000);
-			b = true;
-			record_array[cnt++] = cRTaxis[0].GetUser607A();
-		}
-	} else {
-		is_finish = true;
-	}
-#endif
-
-	/*
-	 * Analog inputs commands for velocity loop
-	 */
-
-#if ANALOG_COMMAND_FOR_VEL_LOOP
-	short aiValue = 0;
-	cRTaxis[2].EthercatReadPIVar(6,0,aiValue);
-
-//	std::cout << aiValue << std::endl;
-	if ((aiValue >=-1000) && (aiValue <=1000))
-	aiValue = 0;
-
-//	std::cout << aiValue << std::endl;
-	double Kp = 50000.0f;
-	double dOutput1 = Kp * aiValue / 1000.0f;
-
-	cRTaxis[0].SetUser60FF(dOutput1);
-	cRTaxis[1].SetUser60FF(dOutput1);
-//	cRTaxis[2].SetUser60FF(dOutput1);
-#endif
-
-	/*
-	 * PID controller for Velocity loop
-	 */
-
-#if VEL_LOOP_PID_CONTROLLER
-	double actual_velocity = cRTaxis[0].GetActualVelocity(); // * 60 / 10000.0f;
-
-	double target_current = PID_velocity(target_velocity - actual_velocity);
-
-	cRTaxis[0].SetUser6071(target_current);
-#endif
-
-	/*
-	 * Sine Gen for Pos Loop
-	 */
-
-#if SIN_GEN_FOR_POS_LOOP
+static void sine_gen_for_pos_loop(void)
+{
 	double rtb_SineWave;
 	double SineWave_AccFreqNorm = 0.0;
 	double SineWave_Frequency = 1.0;
@@ -678,6 +601,101 @@ int SILCallBackFun(void) {
 	// S-Function (E607AWrite): '<Root>/E607AWrite'
 //	  Elmo_Write_607A(SineForPos_P.E607AWrite_p1, rtb_DataTypeConversion);
 	cRTaxis[0].SetUser607A(rtb_DataTypeConversion);
+}
+
+static void sil_test(void)
+{
+	static bool b = false;
+	static unsigned int cnt = 0;
+
+	if (cnt < TEST_COUNT) {
+		if (b) {
+	//		cRTaxis[0].EthercatWritePIVar(4, 0);
+			cRTaxis[0].SetUser607A(0);
+			b = false;
+			record_array[cnt++] = cRTaxis[0].GetUser607A();
+		} else {
+	//		cRTaxis[0].EthercatWritePIVar(4, 65536);
+			cRTaxis[0].SetUser607A(10000);
+			b = true;
+			record_array[cnt++] = cRTaxis[0].GetUser607A();
+		}
+	} else {
+		is_test_finished = true;
+	}
+}
+
+static void analog_command_for_vel_loop(void)
+{
+	short aiValue = 0;
+	cRTaxis[2].EthercatReadPIVar(6,0,aiValue);
+
+//	std::cout << aiValue << std::endl;
+	if ((aiValue >=-1000) && (aiValue <=1000))
+	aiValue = 0;
+
+//	std::cout << aiValue << std::endl;
+	double Kp = 50000.0;
+	double dOutput1 = Kp * aiValue / 1000.0;
+
+	cRTaxis[0].SetUser60FF(dOutput1);
+	cRTaxis[1].SetUser60FF(dOutput1);
+//	cRTaxis[2].SetUser60FF(dOutput1);
+}
+
+static void vel_loop_pid_controller(void)
+{
+	/*
+	 *  KP = 0.08, KI = 1, TS = 1ms for velocity close loop gains in rad/s units
+	 *  KP = 0.01, KI = 1, TS = 1ms for velocity close loop gains in rpm units
+	 */
+	PIDController pid_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
+	double actual_velocity = cRTaxis[0].GetActualVelocity(); // * 60 / 10000.0f;
+	double target_current = pid_velocity(target_velocity - actual_velocity);
+	cRTaxis[0].SetUser6071(target_current);
+}
+
+static void ratchet_effect(void)
+{
+	double distance = 45 * 10000 / 360;
+	PIDController pid_pos { 0.001, 0.1, 0.0, 10000.0, 2.0, 0.00025 };
+	double actual_pos = cRTaxis[0].GetActualPosition();
+	double target_pos = round(actual_pos / distance) * distance;
+	double target_current = pid_pos(target_pos - actual_pos);
+
+	cRTaxis[0].SetUser6071(target_current);
+}
+
+int SILCallBackFun(void) {
+//	TIMER();
+
+#if TEST
+	sil_test();
+#endif
+
+#if RATCHET_EFFECT
+	ratchet_effect();
+#endif
+
+/*
+ * Analog inputs commands for velocity loop
+ */
+#if ANALOG_COMMAND_FOR_VEL_LOOP
+	analog_command_for_vel_loop();
+#endif
+
+/*
+ * PID controller for Velocity loop
+ */
+#if VEL_LOOP_PID_CONTROLLER
+	vel_loop_pid_controller();
+#endif
+
+/*
+ * Sine Gen for Pos Loop
+*/
+#if SIN_GEN_FOR_POS_LOOP
+	sine_gen_for_pos_loop();
 #endif
 
 	return 0;

@@ -10,3 +10,8 @@
 - mylib -> create the lib file in MDS.
 - PVT File Oceaneering -> running a PVT program in Pmas.
 - SIL -> create a SIL program, including several algorithms.
+  - SIL accuracy test
+  - Sine generation for position loop
+  - External analog command for velocity loop
+  - PID algorithm for velocity close loop
+  - Ratchet effect

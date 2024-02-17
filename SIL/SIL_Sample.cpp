@@ -25,7 +25,7 @@
 /**
  * Motion mode list
  */
-enum  MOTIONMODE
+enum class MOTIONMODE : uint8_t
 {
 	PMode,
 	VMode,
@@ -44,7 +44,6 @@ enum  MOTIONMODE
 #define IS_P_DRIVE						0	// use platinum drive
 
 #define TEST_COUNT		200000
-
 static unsigned int record_array[TEST_COUNT] = {0};
 static bool is_test_finished = false;
 static std::fstream file;
@@ -184,7 +183,7 @@ void ReadMbusInput(void) {
 
 	giTerminate = mbus_read_out.regArr[0];
 	target_velocity = static_cast<double>(mbus_read_out.regArr[1]);
-	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 100000.0);
+	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 10000.0);
 	vel_ki = static_cast<double>(mbus_read_out.regArr[3] / 1000.0);
 
 //	std::cout << vel_kp << " " << vel_ki << " " << " | ";
@@ -195,7 +194,7 @@ void ReadMbusInput(void) {
 void UpdatePID(void) {
 	mbus_write_in.startRef = 2;
 	mbus_write_in.refCnt = 2;
-	mbus_write_in.regArr[0] = static_cast<short>(vel_kp * 100000.0);
+	mbus_write_in.regArr[0] = static_cast<short>(vel_kp * 10000.0);
 	mbus_write_in.regArr[1] = static_cast<short>(vel_ki * 1000.0);
 
 //	std::cout << mbus_write_in.regArr[0] << " " << mbus_write_in.regArr[1] << std::endl;
@@ -401,14 +400,17 @@ void MainClose(void) {
 		switch (motionMode) {
 		case MOTIONMODE::PMode: {
 			cRTaxis[i].SetUser607A(0.0f);
+			cRTaxis[i].SetBoolParameter(0, MMC_UCUSER607A_SRC, 0);
 			break;
 		}
 		case MOTIONMODE::VMode: {
 			cRTaxis[i].SetUser60FF(0.0f);
+			cRTaxis[i].SetBoolParameter(0, MMC_UCUSER60FF_SRC, 0);
 			break;
 		}
 		case MOTIONMODE::TMode: {
 			cRTaxis[i].SetUser6071(0.0f);
+			cRTaxis[i].SetBoolParameter(0, MMC_UCUSER6071_SRC, 0);
 			break;
 		}
 		}
@@ -649,7 +651,7 @@ static void vel_loop_pid_controller(void)
 	 *  KP = 0.08, KI = 1, TS = 1ms for velocity close loop gains in rad/s units
 	 *  KP = 0.01, KI = 1, TS = 1ms for velocity close loop gains in rpm units
 	 */
-	PIDController pid_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
+	static PIDController pid_velocity { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
 	double actual_velocity = cRTaxis[0].GetActualVelocity(); // * 60 / 10000.0f;
 	double target_current = pid_velocity(target_velocity - actual_velocity);
 	cRTaxis[0].SetUser6071(target_current);
@@ -657,8 +659,8 @@ static void vel_loop_pid_controller(void)
 
 static void ratchet_effect(void)
 {
-	double distance = 45 * 10000 / 360;
-	PIDController pid_pos { 0.001, 0.1, 0.0, 10000.0, 2.0, 0.00025 };
+	static double distance = 10000 / 20;  // A/B: A -> resolution of feedback, B -> equal parts
+	static PIDController pid_pos { 0.0005, 0.1, 0.0, 10000.0, 2.0, 0.00025 };
 	double actual_pos = cRTaxis[0].GetActualPosition();
 	double target_pos = round(actual_pos / distance) * distance;
 	double target_current = pid_pos(target_pos - actual_pos);

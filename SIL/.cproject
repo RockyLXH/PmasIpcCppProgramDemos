@@ -40,12 +40,13 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="pexe" artifactName="${ProjName}" buildArtefactType="com.elmomc.project.buildArtefactType" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=com.elmomc.project.buildArtefactType" cleanCommand="rm -rf ../*.launch" description="Release Platinum" id="com.elmomc.project.CppPlatinumAdvReleaseConfiguration.483245431" name="PLATINUM_R" optionalBuildProperties="" parent="com.elmomc.project.CppPlatinumAdvReleaseConfiguration" postbuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/generateLaunchConfiguration.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot; &quot;${ConfigName}&quot;" prebuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/cleanPreviousArtifacts.bat &quot;${ProjName}&quot;  &quot;${ProjDirPath}&quot;">
+				<configuration artifactExtension="pexe" artifactName="${ProjName}" buildArtefactType="com.elmomc.project.buildArtefactType" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=com.elmomc.project.buildArtefactType" cleanCommand="rm -rf ../*.launch" description="Release Platinum" id="com.elmomc.project.CppPlatinumAdvReleaseConfiguration.483245431" name="PLATINUM_R" optionalBuildProperties="org.eclipse.cdt.docker.launcher.containerbuild.property.selectedvolumes=,org.eclipse.cdt.docker.launcher.containerbuild.property.volumes=" parent="com.elmomc.project.CppPlatinumAdvReleaseConfiguration" postbuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/generateLaunchConfiguration.bat &quot;${ProjName}&quot; &quot;${ProjDirPath}&quot; &quot;${ConfigName}&quot;" prebuildStep="&quot;${MDS_HOME}&quot;/ElmoUtils/scripts/cleanPreviousArtifacts.bat &quot;${ProjName}&quot;  &quot;${ProjDirPath}&quot;">
 					<folderInfo id="com.elmomc.project.CppPlatinumAdvReleaseConfiguration.483245431." name="/" resourcePath="">
 						<toolChain id="com.elmomc.project.CppPlatinumAdvToolchainRelease.1901565379" name="Elmo C++ toolchain" superClass="com.elmomc.project.CppPlatinumAdvToolchainRelease">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.elmomc.project.Cpp.Platinum.Platform.206495200" isAbstract="false" superClass="com.elmomc.project.Cpp.Platinum.Platform"/>
 							<builder buildPath="${workspace_loc:/SIL}/PLATINUM_R" id="com.elmomc.project.CppPlatinumBuilder.654601759" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU Make" superClass="com.elmomc.project.CppPlatinumBuilder"/>
 							<tool id="com.elmomc.project.CppPlatinumCompiler.627785594" name="Platinum C++ compiler" superClass="com.elmomc.project.CppPlatinumCompiler">
+								<option id="com.elmomc.project.CppPlatinumOptimizationLevel.111313343" name="Optimization Level" superClass="com.elmomc.project.CppPlatinumOptimizationLevel" useByScannerDiscovery="false" value="com.elmomc.project.CppEnumeratedOptimizationNone" valueType="enumerated"/>
 								<inputType id="com.elmomc.project.CppPlatinumSource.422096369" name="C source files" superClass="com.elmomc.project.CppPlatinumSource"/>
 							</tool>
 							<tool id="com.elmomc.project.CppPlatinumLinker.1327967599" name="Platinum C++ linker" superClass="com.elmomc.project.CppPlatinumLinker"/>
@@ -64,5 +65,12 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="PLATINUM_D">
+			<resource resourceType="PROJECT" workspacePath="/SIL"/>
+		</configuration>
+		<configuration configurationName="PLATINUM_R">
+			<resource resourceType="PROJECT" workspacePath="/SIL"/>
+		</configuration>
+	</storageModule>
 </cproject>

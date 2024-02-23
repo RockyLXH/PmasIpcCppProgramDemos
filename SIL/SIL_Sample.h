@@ -12,17 +12,26 @@
  Project general functions prototypes
  ============================================================================
  */
-void MainInit(void);
-void MainClose(void);
-void SILInit(void);
-void MainLoop(void);
-int OnRunTimeError(const char *msg, unsigned int uiConnHndl,
+void
+MainInit(void);
+void
+MainClose(void);
+void
+SILInit(void);
+void
+MainLoop(void);
+int
+OnRunTimeError(const char *msg, unsigned int uiConnHndl,
 		unsigned short usAxisRef, short sErrorID, unsigned short usStatus);
-void TerminateApplication(int iSigNum);
-void Emergency_Received(unsigned short usAxisRef, short sEmcyCode);
+void
+TerminateApplication(int iSigNum);
+void
+Emergency_Received(unsigned short usAxisRef, short sEmcyCode);
 ;
-int CallbackFunc(unsigned char* recvBuffer, short recvBufferSize, void* lpsock);
-int SILCallBackFun(void);
+int
+CallbackFunc(unsigned char* recvBuffer, short recvBufferSize, void* lpsock);
+int
+SILCallBackFun(void);
 
 /*
  ============================================================================
@@ -46,7 +55,7 @@ double vel_kp = 0.0001;
  Global structures for Elmo's Function Blocks
  ============================================================================
  */
-MMC_CONNECT_HNDL gConnHndl;					// Connection Handle
+MMC_CONNECT_HNDL gConnHndl;				// Connection Handle
 CMMCConnection cConn;
 CMMCHostComm MBus;
 

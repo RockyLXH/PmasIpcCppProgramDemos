@@ -46,7 +46,7 @@ SILCallBackFun(void);
  */
 
 bool giTerminate = false;		// Flag to request program termination
-double target_velocity = 0.0;
+double targetVelocity = 0.0;
 double prev_target_velocity = 0.0;
 double vel_ki = 0.0;
 double vel_kp = 0.0001;
@@ -65,3 +65,19 @@ CMMCRTSingleAxis cRTaxis[MAX_AXES];
 
 MMC_MODBUSREADHOLDINGREGISTERSTABLE_OUT mbus_read_out;
 MMC_MODBUSWRITEHOLDINGREGISTERSTABLE_IN mbus_write_in;
+
+const std::string banner =
+R"(
+     
+███████╗██╗██╗         ██████╗ ███████╗███╗   ███╗ ██████╗ 
+██╔════╝██║██║         ██╔══██╗██╔════╝████╗ ████║██╔═══██╗
+███████╗██║██║         ██║  ██║█████╗  ██╔████╔██║██║   ██║
+╚════██║██║██║         ██║  ██║██╔══╝  ██║╚██╔╝██║██║   ██║
+███████║██║███████╗    ██████╔╝███████╗██║ ╚═╝ ██║╚██████╔╝
+╚══════╝╚═╝╚══════╝    ╚═════╝ ╚══════╝╚═╝     ╚═╝ ╚═════╝ 
+                                                                                                         
+╔╦╗╔═╗╔╦╗╔═╗  ╔╗ ╦ ╦  ╦═╗╔═╗╔═╗╦╔═╦ ╦  ╦  ╦╦ ╦
+║║║╠═╣ ║║║╣   ╠╩╗╚╦╝  ╠╦╝║ ║║  ╠╩╗╚╦╝  ║  ║║ ║
+╩ ╩╩ ╩═╩╝╚═╝  ╚═╝ ╩   ╩╚═╚═╝╚═╝╩ ╩ ╩   ╩═╝╩╚═╝
+                                                                                                           
+)";

@@ -1,9 +1,9 @@
 /**
- * Name : 		PID_Sample.cpp
+ * Name : 		SIL Example
  * Author :		Rocky LIU
  * Version :	1.0
- *
- * Description:	Use MODBUS to control the motion,
+
+ *  Description:	Use MODBUS to control the motion,
  * 	HoldingRegister[0] -> =1: terminate the program.
  * 	HoldingRegister[1] -> set target velocity, unit: RPM.
  * 	HoldingRegister[2] -> velocity loop KP.
@@ -28,28 +28,30 @@ enum class MOTIONMODE
 	PMode, VMode, TMode,
 };
 
-void sil_test(void);
-void analog_command_for_vel_loop(void);
-void sine_gen_for_pos_loop(void);
-void vel_loop_pid_controller(void);
-void ratchet_effect(void);
-void edge_effect(void);
+void DoSilTest(void);
+void DoAnalogCmdForVelLoop(void);
+void DoSinGenForPosLoop(void);
+void DoVelLoopPidCtrl(void);
+void DoRatchetEffect(void);
+void DoEdgeEffect(void);
+void DoSmoothEffect(void);
+void DoDampEffect(void);
 
 /**
  * Set the motion mode and function want to be run
  */
-auto cur_sil_func = edge_effect;
-MOTIONMODE cur_motion_mode = MOTIONMODE::TMode;
+auto currentSilFunc = DoSmoothEffect;
+MOTIONMODE currentMotionMode = MOTIONMODE::TMode;
 
-PIDController pid_velocity
+PIDController pidVelocity
 { vel_kp, vel_ki, 0.0f, 1000.0, 1.0, 0.001 };
 
 #define TEST_COUNT		200000
-static unsigned int record_array[TEST_COUNT] =
+static unsigned int recordArray[TEST_COUNT] =
 { 0 };
-static bool is_test_finished = false;
+static bool isTestFinished = false;
 static std::fstream file;
-static double init_pos[MAX_AXES] =
+static double initPos[MAX_AXES] =
 { 0.0 };
 
 #define USE_MDS3						0
@@ -120,6 +122,7 @@ public:
 
 int main(int argc, char *argv[])
 {
+	std::cout << banner;
 	try
 	{
 		/*
@@ -187,7 +190,7 @@ void ReadMbusInput(void)
 	MBus.MbusReadHoldingRegisterTable(0, 4, mbus_read_out);
 
 	giTerminate = mbus_read_out.regArr[0];
-	target_velocity = static_cast<double>(mbus_read_out.regArr[1]);
+	targetVelocity = static_cast<double>(mbus_read_out.regArr[1]);
 	vel_kp = static_cast<double>(mbus_read_out.regArr[2] / 10000.0);
 	vel_ki = static_cast<double>(mbus_read_out.regArr[3] / 1000.0);
 
@@ -224,17 +227,16 @@ void MainLoop(void)
 
 		ReadMbusInput();
 
-		if (is_test_finished)
+		if (isTestFinished)
 		{
 			std::cout << "SIL Test is done\n";
 			break;
 		}
 
-		if ((pid_velocity.GetKi() != vel_ki)
-				|| (pid_velocity.GetKp() != vel_kp))
+		if ((pidVelocity.GetKi() != vel_ki) || (pidVelocity.GetKp() != vel_kp))
 		{
-			pid_velocity.SetKi(vel_ki);
-			pid_velocity.SetKp(vel_kp);
+			pidVelocity.SetKi(vel_ki);
+			pidVelocity.SetKp(vel_kp);
 		}
 
 		UpdatePID();
@@ -255,7 +257,7 @@ void SILInit(void)
 		// 0 - NC profiler
 		// 1 - 0;
 		// 2 - User
-		switch (cur_motion_mode)
+		switch (currentMotionMode)
 		{
 		case MOTIONMODE::PMode:
 		{
@@ -296,12 +298,12 @@ void SILInit(void)
 		while (!(cRTaxis[i].ReadStatus() & NC_AXIS_STAND_STILL_MASK))
 			usleep(10000);
 
-		init_pos[i] = cRTaxis[i].GetActualPosition();
+		initPos[i] = cRTaxis[i].GetActualPosition();
 
 	}
 
 	MMC_CreateSYNCTimer(gConnHndl, []
-	{	cur_sil_func(); return 0;}, 1); // sync timer 1X
+	{	currentSilFunc(); return 0;}, 1); // sync timer 1X
 
 	// set user call-back function to highest priority -> 1.
 	// it must be set after CreateSyncTimer func, not before.
@@ -402,7 +404,7 @@ void MainClose(void)
 
 	for (int i = 0; i < MAX_AXES; ++i)
 	{
-		switch (cur_motion_mode)
+		switch (currentMotionMode)
 		{
 		case MOTIONMODE::PMode:
 		{
@@ -431,7 +433,7 @@ void MainClose(void)
 
 	}
 
-	if (is_test_finished)
+	if (isTestFinished)
 	{
 		file.open("record.txt", ios::out);
 		if (!file.is_open())
@@ -439,7 +441,7 @@ void MainClose(void)
 
 		for (int i = 0; i < TEST_COUNT; ++i)
 		{
-			file << record_array[i] << endl;
+			file << recordArray[i] << endl;
 		}
 		file.flush();
 		file.close();
@@ -579,7 +581,7 @@ void Emergency_Received(unsigned short usAxisRef, short sEmcyCode)
 
 }
 
-void sine_gen_for_pos_loop(void)
+void DoSinGenForPosLoop(void)
 {
 	double rtb_SineWave;
 	double SineWave_AccFreqNorm = 0.0;
@@ -625,7 +627,7 @@ void sine_gen_for_pos_loop(void)
 	cRTaxis[0].SetUser607A(rtb_DataTypeConversion);
 }
 
-void sil_test(void)
+void DoSilTest(void)
 {
 	static bool b = false;
 	static unsigned int cnt = 0;
@@ -637,70 +639,70 @@ void sil_test(void)
 			//		cRTaxis[0].EthercatWritePIVar(4, 0);
 			cRTaxis[0].SetUser607A(0);
 			b = false;
-			record_array[cnt++] = cRTaxis[0].GetUser607A();
+			recordArray[cnt++] = cRTaxis[0].GetUser607A();
 		}
 		else
 		{
 			//		cRTaxis[0].EthercatWritePIVar(4, 65536);
 			cRTaxis[0].SetUser607A(10000);
 			b = true;
-			record_array[cnt++] = cRTaxis[0].GetUser607A();
+			recordArray[cnt++] = cRTaxis[0].GetUser607A();
 		}
 	}
 	else
 	{
-		is_test_finished = true;
+		isTestFinished = true;
 	}
 }
 
-void analog_command_for_vel_loop(void)
+void DoAnalogCmdForVelLoop(void)
 {
-	short aiValue = 0;
-	cRTaxis[2].EthercatReadPIVar(6, 0, aiValue);
+	short value = 0;
+	cRTaxis[2].EthercatReadPIVar(6, 0, value);
 
 //	std::cout << aiValue << std::endl;
-	if ((aiValue >= -1000) && (aiValue <= 1000))
-		aiValue = 0;
+	if ((value >= -1000) && (value <= 1000))
+		value = 0;
 
 //	std::cout << aiValue << std::endl;
-	double Kp = 50000.0;
-	double dOutput1 = Kp * aiValue / 1000.0;
+	double kp = 50000.0;
+	double output = kp * value / 1000.0;
 
-	cRTaxis[0].SetUser60FF(dOutput1);
-	cRTaxis[1].SetUser60FF(dOutput1);
+	cRTaxis[0].SetUser60FF(output);
+	cRTaxis[1].SetUser60FF(output);
 //	cRTaxis[2].SetUser60FF(dOutput1);
 }
 
-void vel_loop_pid_controller(void)
+void DoVelLoopPidCtrl(void)
 {
 	/*
 	 *  KP = 0.08, KI = 1, TS = 1ms for velocity close loop gains in rad/s units
 	 *  KP = 0.01, KI = 1, TS = 1ms for velocity close loop gains in rpm units
 	 */
 
-	double actual_velocity = cRTaxis[0].GetActualVelocity(); // * 60 / 10000.0f;
-	double target_current = pid_velocity(target_velocity - actual_velocity);
-	cRTaxis[0].SetUser6071(target_current);
+	double actVelocity = cRTaxis[0].GetActualVelocity(); // * 60 / 10000.0f;
+	double targetCurrent = pidVelocity(targetVelocity - actVelocity);
+	cRTaxis[0].SetUser6071(targetCurrent);
 }
 
-void ratchet_effect(void)
+void DoRatchetEffect(void)
 {
 	static double distance = 10000 / 10; // A/B: A -> resolution of feedback, B -> equal parts
-	static PIDController pid_pos
+	static PIDController pidPos
 	{ 0.0008, 0.0, 0.0, 10000.0, 2.0, 0.00025 };
-	double actual_pos = cRTaxis[0].GetActualPosition();
-	double target_pos = round(actual_pos / distance) * distance;
-	double target_current = pid_pos(target_pos - actual_pos);
+	double actPos = cRTaxis[0].GetActualPosition();
+	double targetPos = round(actPos / distance) * distance;
+	double targetCurrent = pidPos(targetPos - actPos);
 
-	cRTaxis[0].SetUser6071(target_current);
+	cRTaxis[0].SetUser6071(targetCurrent);
 }
 
-void edge_effect(void)
+void DoEdgeEffect(void)
 {
-	double act_pos = cRTaxis[0].GetActualPosition();
-	static PIDController pid_pos
+	double actPos = cRTaxis[0].GetActualPosition();
+	static PIDController pidPos
 	{ 0.01, 0.0, 0.0, 10000.0, 2.0, 0.00025 };
-	double L = init_pos[0] - 2500, R = init_pos[0] + 2500;
+	double L = initPos[0] - 2500, R = initPos[0] + 2500;
 
 //	if (act_pos < R && act_pos > L)
 //		cRTaxis[0].SetUser6071(0);
@@ -712,8 +714,22 @@ void edge_effect(void)
 //			cRTaxis[0].SetUser6071(pid_pos(R - act_pos));
 //	}
 
-	double output = (act_pos < L) ? (L - act_pos) :
-					(act_pos > R) ? (R - act_pos) : 0.0;
+	double output = (actPos < L) ? (L - actPos) :
+					(actPos > R) ? (R - actPos) : 0.0;
 
-	cRTaxis[0].SetUser6071(pid_pos(output));
+	cRTaxis[0].SetUser6071(pidPos(output));
+}
+
+void DoDampEffect(void)
+{
+	double kp = 0.0001;
+
+	cRTaxis[0].SetUser6071(-kp*cRTaxis[0].GetActualVelocity());
+}
+
+void DoSmoothEffect(void)
+{
+	static PIDController pid {0.0001,0,0,1000,0.05,0.00025};
+
+	cRTaxis[0].SetUser6071(pid(cRTaxis[0].GetActualVelocity()));
 }

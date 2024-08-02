@@ -11,6 +11,7 @@ namespace Sil
 	OPM402 opMode = OPM402_CYCLIC_SYNC_POSITION_MODE;
 	MMC_PARAMETER_LIST_ENUM source = MMC_UCUSER607A_SRC;
 	auto currentSilFunc = DoSinGenForPosLoop;
+	void (CMMCRTSingleAxis::*command)(int) = &CMMCRTSingleAxis::SetUser607A;
 
 	int AxisInit(void)
 	{
@@ -44,19 +45,13 @@ namespace Sil
 			MMC_DestroySYNCTimer(Maestro::connectHandler);
 
 			rtAxis[i].SetBoolParameter(0, // 0 - NC profiler; 2 - User;
-									   source, 0);
+									   source,
+									   0);
 			rtAxis[i].SetOpMode(opMode);
 			while (rtAxis[i].GetOpMode() != opMode);
 			rtAxis[i].SetBoolParameter(2, source, 0);
 
-			if (opMode == OPM402_CYCLIC_SYNC_POSITION_MODE)
-				rtAxis[i].SetUser607A(0);
-			else if (opMode == OPM402_CYCLIC_SYNC_VELOCITY_MODE)
-				rtAxis[i].SetUser60FF(0);
-			else if (opMode == OPM402_CYCLIC_SYNC_TORQUE_MODE)
-				rtAxis[i].SetUser6071(0.0f);
-			else
-				return -1;
+			(rtAxis[i].*command)(0.0f);
 
 			usleep(1000);	// wait some time for ensure the mode changes done.
 
